@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle, AlertCircle, Settings, Link, Unlink } from 'lucide-react';
+import { Calendar, CheckCircle, AlertCircle, Settings, Link, Unlink, X } from 'lucide-react';
 import calendarService from '../services/calendarService';
 
 const CalendarSettings = ({ isOpen, onClose, onSave }) => {
