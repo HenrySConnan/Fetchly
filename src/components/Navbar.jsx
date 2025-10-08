@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Heart, User, LogOut } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
@@ -49,24 +50,40 @@ const Navbar = () => {
             
             {/* Auth Section */}
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors"
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/dashboard"
+                  className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors px-3 py-2 rounded-lg hover:bg-primary-50"
                 >
-                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-primary-600" />
-                  </div>
-                  <span className="text-sm font-medium">
-                    {user.user_metadata?.first_name || 'User'}
-                  </span>
-                </button>
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">Dashboard</span>
+                </Link>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary-600" />
+                    </div>
+                    <span className="text-sm font-medium">
+                      {user.user_metadata?.first_name || 'User'}
+                    </span>
+                  </button>
                 
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 glass-card rounded-xl py-2 shadow-lg z-50">
                     <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200">
                       {user.email}
                     </div>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setShowUserMenu(false)}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Dashboard</span>
+                    </Link>
                     <button
                       onClick={async () => {
                         await signOut();
@@ -79,6 +96,7 @@ const Navbar = () => {
                     </button>
                   </div>
                 )}
+                </div>
               </div>
             ) : (
               <Link
@@ -126,7 +144,7 @@ const Navbar = () => {
               {/* Mobile Auth */}
               {user ? (
                 <div className="pt-4 border-t border-gray-200">
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex items-center space-x-3 mb-4">
                     <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-primary-600" />
                     </div>
@@ -137,6 +155,16 @@ const Navbar = () => {
                       <div className="text-xs text-gray-500">{user.email}</div>
                     </div>
                   </div>
+                  
+                  {/* Mobile Dashboard Button */}
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full mb-3 btn-primary text-center flex items-center justify-center space-x-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>My Dashboard</span>
+                  </Link>
                   <button
                     onClick={async () => {
                       await signOut();
