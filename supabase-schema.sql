@@ -76,6 +76,14 @@ CREATE TABLE bookings (
   pet_type VARCHAR(50),
   pet_breed VARCHAR(100),
   special_instructions TEXT,
+  -- Recurring appointment fields
+  is_recurring BOOLEAN DEFAULT false,
+  recurring_type VARCHAR(20) CHECK (recurring_type IN ('weekly', 'biweekly', 'monthly', 'quarterly')),
+  recurring_end_date DATE,
+  parent_booking_id UUID REFERENCES bookings(id) ON DELETE CASCADE,
+  -- Calendar integration
+  calendar_event_id VARCHAR(255),
+  calendar_provider VARCHAR(20) CHECK (calendar_provider IN ('google', 'outlook', 'apple')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -222,3 +230,42 @@ CREATE POLICY "Users can delete own pets" ON pets FOR DELETE USING (auth.uid() =
 -- Users can view and create reviews
 CREATE POLICY "Anyone can view reviews" ON reviews FOR SELECT USING (true);
 CREATE POLICY "Users can create reviews" ON reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Create service packages table
+CREATE TABLE service_packages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+  description TEXT,
+  services JSONB NOT NULL, -- Array of service IDs with quantities
+  total_sessions INTEGER NOT NULL,
+  discount_percentage DECIMAL(5,2) DEFAULT 0.00,
+  price DECIMAL(10,2) NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create waitlist table
+CREATE TABLE waitlist (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  service_id UUID REFERENCES services(id) ON DELETE CASCADE,
+  provider_id UUID REFERENCES providers(id) ON DELETE CASCADE,
+  preferred_date DATE,
+  preferred_time TIME,
+  notes TEXT,
+  status VARCHAR(20) DEFAULT 'waiting' CHECK (status IN ('waiting', 'notified', 'booked', 'cancelled')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS on new tables
+ALTER TABLE service_packages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE waitlist ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for new tables
+CREATE POLICY "Anyone can view service packages" ON service_packages FOR SELECT USING (true);
+CREATE POLICY "Users can view own waitlist entries" ON waitlist FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can create own waitlist entries" ON waitlist FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own waitlist entries" ON waitlist FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own waitlist entries" ON waitlist FOR DELETE USING (auth.uid() = user_id);

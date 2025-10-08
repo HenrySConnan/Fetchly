@@ -7,6 +7,7 @@ import Auth from './components/Auth';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import Deals from './pages/Deals';
+import ServicePackages from './pages/ServicePackages';
 import Dashboard from './pages/Dashboard';
 
 const Shop = () => (
@@ -33,6 +34,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/deals" element={<Deals />} />
+                  <Route path="/packages" element={<ServicePackages />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/auth" element={<Auth />} />

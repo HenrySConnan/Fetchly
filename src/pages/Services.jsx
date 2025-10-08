@@ -20,7 +20,7 @@ import {
   User
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import BookingModal from '../components/BookingModal';
+import EnhancedBookingModal from '../components/EnhancedBookingModal';
 
 const Services = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -261,16 +261,16 @@ const Services = () => {
         </div>
       </section>
 
-      {/* Booking Modal */}
-      <BookingModal
-        isOpen={showBookingModal}
-        onClose={() => {
-          setShowBookingModal(false);
-          setSelectedService(null);
-        }}
-        service={selectedService}
-        providers={providers}
-      />
+          {/* Enhanced Booking Modal */}
+          <EnhancedBookingModal
+            isOpen={showBookingModal}
+            onClose={() => {
+              setShowBookingModal(false);
+              setSelectedService(null);
+            }}
+            service={selectedService}
+            providers={providers}
+          />
     </div>
   );
 };
