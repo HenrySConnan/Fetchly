@@ -6,16 +6,7 @@ import Footer from './components/Footer';
 import Auth from './components/Auth';
 import Home from './pages/Home';
 import Services from './pages/Services';
-
-// Placeholder pages for future development
-const Bookings = () => (
-  <div className="min-h-screen pt-20 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="font-inter font-bold text-4xl text-text mb-4">Bookings</h1>
-      <p className="font-inter text-text/70">Coming soon...</p>
-    </div>
-  </div>
-);
+import Bookings from './pages/Bookings';
 
 const Shop = () => (
   <div className="min-h-screen pt-20 flex items-center justify-center">
