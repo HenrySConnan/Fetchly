@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Stethoscope, Scissors, Dog, Clock, Star, MapPin, ArrowRight, CheckCircle } from 'lucide-react';
+import { Stethoscope, Scissors, Footprints, Clock, Star, MapPin, ArrowRight, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Services = () => {
   const services = [
@@ -33,7 +34,7 @@ const Services = () => {
       id: 3,
       title: 'Dog Walking',
       description: 'Regular exercise and outdoor time for your dogs with trusted walkers.',
-      icon: Dog,
+      icon: Footprints,
       price: 'From $25',
       duration: '30-60 min',
       rating: 4.7,
@@ -45,7 +46,7 @@ const Services = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
@@ -140,10 +141,13 @@ const Services = () => {
                   </div>
 
                   {/* Book Now Button */}
-                  <button className="w-full btn-primary flex items-center justify-center space-x-2 group">
+                  <Link 
+                    to="/bookings"
+                    className="w-full btn-primary flex items-center justify-center space-x-2 group"
+                  >
                     <span>Book Now</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -170,10 +174,13 @@ const Services = () => {
                 Join thousands of pet owners who trust us with their furry family members.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button className="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center space-x-2">
+                <Link 
+                  to="/bookings"
+                  className="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center space-x-2"
+                >
                   <span>Browse Services</span>
                   <ArrowRight className="w-5 h-5" />
-                </button>
+                </Link>
                 <button className="bg-white/20 backdrop-blur-xl text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 hover:scale-105 border border-white/30">
                   Contact Us
                 </button>
