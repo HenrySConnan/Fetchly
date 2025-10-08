@@ -6,7 +6,6 @@ import Footer from './components/Footer';
 import Auth from './components/Auth';
 import Home from './pages/Home';
 import Services from './pages/Services';
-import Bookings from './pages/Bookings';
 
 const Shop = () => (
   <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -28,13 +27,12 @@ function App() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/auth" element={<Auth />} />
-            </Routes>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/auth" element={<Auth />} />
+                </Routes>
           </motion.main>
           <Footer />
         </div>
