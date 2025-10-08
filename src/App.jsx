@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Auth from './components/Auth';
 import Home from './pages/Home';
 import Services from './pages/Services';
+import Deals from './pages/Deals';
 
 const Shop = () => (
   <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -30,6 +31,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/services" element={<Services />} />
+                  <Route path="/deals" element={<Deals />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/auth" element={<Auth />} />
                 </Routes>
