@@ -130,68 +130,46 @@ const Services = () => {
       {/* Search and Filter Section */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="glass-card rounded-2xl p-8 mb-8">
-            <div className="flex flex-col lg:flex-row gap-6">
+          <div className="glass-card rounded-2xl p-6 mb-8">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                   <input
                     type="text"
                     placeholder="Search services..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
                   />
                 </div>
               </div>
 
-              {/* Price Range */}
-              <div className="lg:w-64">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Range: ${priceRange[0]} - ${priceRange[1]}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="200"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="w-full"
-                />
+              {/* Category Dropdown */}
+              <div className="sm:w-64">
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="all">All Categories</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                selectedCategory === 'all'
-                  ? 'bg-primary-600 text-white shadow-lg'
-                  : 'bg-white/80 text-gray-700 hover:bg-white/90'
-              }`}
-            >
-              All Services
-            </button>
-            {categories.map((category) => {
-              const IconComponent = categoryIcons[category.name.toLowerCase().replace(' ', '-')] || Stethoscope;
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.name)}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 ${
-                    selectedCategory === category.name
-                      ? 'bg-primary-600 text-white shadow-lg'
-                      : 'bg-white/80 text-gray-700 hover:bg-white/90'
-                  }`}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  <span>{category.name}</span>
-                </button>
-              );
-            })}
           </div>
         </div>
       </section>
