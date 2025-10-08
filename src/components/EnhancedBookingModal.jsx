@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Clock, User, MapPin, Phone, Star, DollarSign, RotateCcw, Package, Bell } from 'lucide-react';
+import { X, Calendar, Clock, User, MapPin, Phone, Star, DollarSign, RotateCcw, Package, Bell, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import calendarService from '../services/calendarService';
+import CalendarSettings from './CalendarSettings';
 
 const EnhancedBookingModal = ({ isOpen, onClose, service, providers = [] }) => {
   const [selectedProvider, setSelectedProvider] = useState(null);
@@ -29,6 +31,11 @@ const EnhancedBookingModal = ({ isOpen, onClose, service, providers = [] }) => {
   // Waitlist states
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [waitlistReason, setWaitlistReason] = useState('');
+
+  // Calendar states
+  const [showCalendarSettings, setShowCalendarSettings] = useState(false);
+  const [calendarEnabled, setCalendarEnabled] = useState(false);
+  const [calendarProvider, setCalendarProvider] = useState('google');
 
   const timeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -154,24 +161,60 @@ const EnhancedBookingModal = ({ isOpen, onClose, service, providers = [] }) => {
   };
 
   const createSingleBooking = async () => {
-    const { error } = await supabase
+    const bookingData = {
+      user_id: user.id,
+      provider_id: selectedProvider.id,
+      service_id: service.id,
+      booking_date: selectedDate,
+      booking_time: selectedTime,
+      duration_minutes: service.duration_minutes,
+      total_price: calculateTotalPrice(),
+      pet_name: petName,
+      pet_type: petType,
+      special_instructions: specialInstructions,
+      is_recurring: false,
+      status: 'pending'
+    };
+
+    const { data, error } = await supabase
       .from('bookings')
-      .insert({
-        user_id: user.id,
-        provider_id: selectedProvider.id,
-        service_id: service.id,
-        booking_date: selectedDate,
-        booking_time: selectedTime,
-        duration_minutes: service.duration_minutes,
-        total_price: calculateTotalPrice(),
-        pet_name: petName,
-        pet_type: petType,
-        special_instructions: specialInstructions,
-        is_recurring: false,
-        status: 'pending'
-      });
+      .insert(bookingData)
+      .select()
+      .single();
 
     if (error) throw error;
+
+    // Create calendar event if enabled
+    if (calendarEnabled) {
+      try {
+        const bookingWithDetails = {
+          ...bookingData,
+          service_name: service.name,
+          provider_name: selectedProvider.name,
+          provider_address: selectedProvider.address,
+          user_email: user.email,
+          user_name: user.user_metadata?.first_name || 'User'
+        };
+
+        const calendarResult = await calendarService.createCalendarEvent(bookingWithDetails, calendarProvider);
+        
+        if (calendarResult.success) {
+          // Update booking with calendar event ID
+          await supabase
+            .from('bookings')
+            .update({
+              calendar_event_id: calendarResult.eventId,
+              calendar_provider: calendarProvider
+            })
+            .eq('id', data.id);
+        }
+      } catch (calendarError) {
+        console.error('Calendar integration failed:', calendarError);
+        // Don't fail the booking if calendar integration fails
+      }
+    }
+
+    return data;
   };
 
   const createRecurringBookings = async () => {
@@ -484,6 +527,44 @@ const EnhancedBookingModal = ({ isOpen, onClose, service, providers = [] }) => {
                   )}
                 </div>
 
+                {/* Calendar Integration */}
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="w-4 h-4 text-primary-600" />
+                      <span className="font-medium text-gray-900">Calendar Integration</span>
+                    </div>
+                    <button
+                      onClick={() => setShowCalendarSettings(true)}
+                      className="text-primary-600 hover:text-primary-700 font-medium flex items-center space-x-1"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="calendarEnabled"
+                      checked={calendarEnabled}
+                      onChange={(e) => setCalendarEnabled(e.target.checked)}
+                      className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                    />
+                    <label htmlFor="calendarEnabled" className="text-sm text-gray-700">
+                      Add this appointment to my calendar
+                    </label>
+                  </div>
+                  
+                  {calendarEnabled && (
+                    <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        Your appointment will be automatically added to your {calendarProvider === 'google' ? 'Google' : 'Outlook'} Calendar with reminders.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {/* Waitlist Option */}
                 <div className="border-t pt-6">
                   <div className="flex items-center justify-between">
@@ -656,6 +737,16 @@ const EnhancedBookingModal = ({ isOpen, onClose, service, providers = [] }) => {
           </div>
         </motion.div>
       </div>
+
+      {/* Calendar Settings Modal */}
+      <CalendarSettings
+        isOpen={showCalendarSettings}
+        onClose={() => setShowCalendarSettings(false)}
+        onSave={(settings) => {
+          setCalendarProvider(settings.provider);
+          setCalendarEnabled(settings.googleConnected || settings.outlookConnected);
+        }}
+      />
     </AnimatePresence>
   );
 };

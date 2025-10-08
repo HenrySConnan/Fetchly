@@ -9,6 +9,7 @@ import Services from './pages/Services';
 import Deals from './pages/Deals';
 import ServicePackages from './pages/ServicePackages';
 import Dashboard from './pages/Dashboard';
+import Waitlist from './pages/Waitlist';
 
 const Shop = () => (
   <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -35,6 +36,7 @@ function App() {
                   <Route path="/services" element={<Services />} />
                   <Route path="/deals" element={<Deals />} />
                   <Route path="/packages" element={<ServicePackages />} />
+                  <Route path="/waitlist" element={<Waitlist />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/auth" element={<Auth />} />
