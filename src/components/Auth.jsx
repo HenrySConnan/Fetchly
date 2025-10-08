@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 
@@ -15,6 +16,7 @@ const Auth = () => {
   const [message, setMessage] = useState('')
 
   const { signIn, signUp } = useAuth()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -28,6 +30,10 @@ const Auth = () => {
           setMessage(error.message)
         } else {
           setMessage('Successfully signed in!')
+          // Redirect to home page after successful login
+          setTimeout(() => {
+            navigate('/')
+          }, 1000)
         }
       } else {
         const { error } = await signUp(
