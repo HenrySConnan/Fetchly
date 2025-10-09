@@ -9,6 +9,9 @@ import Services from './pages/Services';
 import Deals from './pages/Deals';
 import ServicePackages from './pages/ServicePackages';
 import Dashboard from './pages/Dashboard';
+import BusinessDashboard from './pages/BusinessDashboard';
+import BusinessUpgrade from './pages/BusinessUpgrade';
+import AdminDashboard from './pages/AdminDashboard';
 import Waitlist from './pages/Waitlist';
 
 const Shop = () => (
@@ -40,6 +43,9 @@ function App() {
                   <Route path="/waitlist" element={<Waitlist />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/business" element={<BusinessDashboard />} />
+                  <Route path="/business-upgrade" element={<BusinessUpgrade />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/auth" element={<Auth />} />
                 </Routes>
           </motion.main>

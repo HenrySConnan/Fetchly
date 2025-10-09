@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart, User, LogOut, Calendar, ShoppingBag, Percent, Package, Clock } from 'lucide-react';
+import { Menu, X, Heart, User, LogOut, Calendar, ShoppingBag, Percent, Package, Clock, Building, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { useBusinessAccess } from '../hooks/useBusinessAccess';
+import { useAdminAccess } from '../hooks/useAdminAccess';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isBusinessAccount } = useBusinessAccess();
+  const { isAdmin } = useAdminAccess();
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Heart },
@@ -70,6 +74,24 @@ const Navbar = () => {
                     <User className="w-4 h-4" />
                     <span className="text-sm font-medium">Dashboard</span>
                   </Link>
+                  {isBusinessAccount && (
+                    <Link
+                      to="/business"
+                      className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors px-3 py-2 rounded-lg hover:bg-primary-50"
+                    >
+                      <Building className="w-4 h-4" />
+                      <span className="text-sm font-medium">Business</span>
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors px-3 py-2 rounded-lg hover:bg-primary-50"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm font-medium">Admin</span>
+                    </Link>
+                  )}
                   <div className="relative">
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
@@ -96,6 +118,26 @@ const Navbar = () => {
                           <User className="w-4 h-4" />
                           <span>Dashboard</span>
                         </Link>
+                        {isBusinessAccount && (
+                          <Link
+                            to="/business"
+                            onClick={() => setShowUserMenu(false)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                          >
+                            <Building className="w-4 h-4" />
+                            <span>Business</span>
+                          </Link>
+                        )}
+                        {isAdmin && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setShowUserMenu(false)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                          >
+                            <Shield className="w-4 h-4" />
+                            <span>Admin</span>
+                          </Link>
+                        )}
                         <button
                           onClick={async () => {
                             await signOut();
@@ -195,6 +237,36 @@ const Navbar = () => {
                       <div className="text-xs text-gray-500">{user.email}</div>
                     </div>
                   </div>
+                  
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-4 py-3 text-sm text-gray-700 hover:text-primary-600 hover:bg-gray-50 flex items-center space-x-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                  
+                  {isBusinessAccount && (
+                    <Link
+                      to="/business"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-700 hover:text-primary-600 hover:bg-gray-50 flex items-center space-x-2"
+                    >
+                      <Building className="w-4 h-4" />
+                      <span>Business</span>
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-700 hover:text-primary-600 hover:bg-gray-50 flex items-center space-x-2"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span>Admin</span>
+                    </Link>
+                  )}
                   
                   <button
                     onClick={async () => {
