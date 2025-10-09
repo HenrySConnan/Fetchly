@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useBusinessAccess } from '../hooks/useBusinessAccess';
 import { useAdminAccess } from '../hooks/useAdminAccess';
+import { useUserType } from '../hooks/useUserType';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +14,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { isBusinessAccount } = useBusinessAccess();
   const { isAdmin, isLoading: adminLoading } = useAdminAccess();
+  const { userType } = useUserType();
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Heart },
@@ -110,7 +112,7 @@ const Navbar = () => {
                         <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200">
                           {user.email}
                         </div>
-                        {!adminLoading && !isAdmin && (
+                        {userType === 'user' && (
                           <Link
                             to="/dashboard"
                             onClick={() => setShowUserMenu(false)}
@@ -120,7 +122,7 @@ const Navbar = () => {
                             <span>Dashboard</span>
                           </Link>
                         )}
-                        {isBusinessAccount && (
+                        {userType === 'business' && (
                           <Link
                             to="/business"
                             onClick={() => setShowUserMenu(false)}
@@ -130,7 +132,7 @@ const Navbar = () => {
                             <span>Business</span>
                           </Link>
                         )}
-                        {!adminLoading && isAdmin && (
+                        {userType === 'admin' && (
                           <Link
                             to="/admin"
                             onClick={() => setShowUserMenu(false)}

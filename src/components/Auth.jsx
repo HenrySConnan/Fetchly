@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { useBusinessAccess } from '../hooks/useBusinessAccess'
+import { useAdminAccess } from '../hooks/useAdminAccess'
+import { Mail, Lock, User, Eye, EyeOff, Building } from 'lucide-react'
+import BusinessSignupModal from './BusinessSignupModal'
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
+  const [showBusinessSignup, setShowBusinessSignup] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -15,7 +19,9 @@ const Auth = () => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, user } = useAuth()
+  const { isBusinessOwner, isBusinessApproved } = useBusinessAccess()
+  const { isAdmin } = useAdminAccess()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -30,11 +36,12 @@ const Auth = () => {
           setMessage(error.message)
         } else {
           setMessage('Successfully signed in!')
-          // Check if user is admin and redirect accordingly
+          // Redirect based on user type
           setTimeout(() => {
-            // Check if the email is the admin email
-            if (formData.email === 'henry@donco.co.za') {
+            if (isAdmin) {
               navigate('/admin')
+            } else if (isBusinessOwner && isBusinessApproved) {
+              navigate('/business')
             } else {
               navigate('/')
             }
@@ -184,25 +191,57 @@ const Auth = () => {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin)
-                setMessage('')
-                setFormData({
-                  email: '',
-                  password: '',
-                  firstName: '',
-                  lastName: '',
-                })
-              }}
-              className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
-            >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-            </button>
+          <div className="mt-6 space-y-4">
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  setIsLogin(!isLogin)
+                  setMessage('')
+                  setFormData({
+                    email: '',
+                    password: '',
+                    firstName: '',
+                    lastName: '',
+                  })
+                }}
+                className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              >
+                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              </button>
+            </div>
+
+            {!isLogin && (
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or</span>
+                </div>
+              </div>
+            )}
+
+            {!isLogin && (
+              <button
+                onClick={() => setShowBusinessSignup(true)}
+                className="w-full flex items-center justify-center space-x-2 py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <Building className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Sign up as Business</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      <BusinessSignupModal
+        isOpen={showBusinessSignup}
+        onClose={() => setShowBusinessSignup(false)}
+        onSuccess={() => {
+          setShowBusinessSignup(false);
+          setMessage('Business application submitted successfully!');
+        }}
+      />
     </div>
   )
 }

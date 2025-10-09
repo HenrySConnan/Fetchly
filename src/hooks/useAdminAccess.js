@@ -20,15 +20,11 @@ export const useAdminAccess = () => {
         setIsLoading(true);
         setError(null);
 
-        // Call the check_admin_access function
-        const { data, error: functionError } = await supabase.rpc('check_admin_access');
-        
-        if (functionError) {
-          console.error('Error checking admin access:', functionError);
-          setError(functionError.message);
-          setIsAdmin(false);
+        // Simple email check for admin
+        if (user.email === 'henry@donco.co.za') {
+          setIsAdmin(true);
         } else {
-          setIsAdmin(data === true);
+          setIsAdmin(false);
         }
       } catch (err) {
         console.error('Error checking admin access:', err);

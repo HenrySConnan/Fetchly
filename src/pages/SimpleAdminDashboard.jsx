@@ -14,10 +14,14 @@ import {
   RefreshCw,
   Settings,
   LogOut,
-  Home
+  Home,
+  Eye,
+  Clock
 } from 'lucide-react';
 import { useAdminAccess } from '../hooks/useAdminAccess';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import AdminCategoryManager from '../components/AdminCategoryManager';
 
 const SimpleAdminDashboard = () => {
   const { isAdmin, isLoading, error } = useAdminAccess();
@@ -29,12 +33,21 @@ const SimpleAdminDashboard = () => {
     totalBookings: 0,
     totalRevenue: 0
   });
+  const [pendingBusinesses, setPendingBusinesses] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     if (!isLoading && !isAdmin) {
       navigate('/');
     }
   }, [isAdmin, isLoading, navigate]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadStats();
+      loadPendingBusinesses();
+    }
+  }, [isAdmin]);
 
   const loadStats = async () => {
     try {
@@ -47,6 +60,65 @@ const SimpleAdminDashboard = () => {
       });
     } catch (error) {
       console.error('Error loading stats:', error);
+    }
+  };
+
+  const loadPendingBusinesses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('business_profiles')
+        .select(`
+          *,
+          business_service_categories(
+            service_categories(name)
+          )
+        `)
+        .eq('is_approved', false)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPendingBusinesses(data || []);
+    } catch (error) {
+      console.error('Error loading pending businesses:', error);
+    }
+  };
+
+  const handleApproveBusiness = async (businessId) => {
+    try {
+      const { error } = await supabase
+        .from('business_profiles')
+        .update({
+          is_approved: true,
+          approved_by: (await supabase.auth.getUser()).data.user?.id,
+          approved_at: new Date().toISOString()
+        })
+        .eq('id', businessId);
+
+      if (error) throw error;
+      
+      // Reload pending businesses
+      loadPendingBusinesses();
+    } catch (error) {
+      console.error('Error approving business:', error);
+    }
+  };
+
+  const handleRejectBusiness = async (businessId) => {
+    try {
+      const { error } = await supabase
+        .from('business_profiles')
+        .update({
+          is_approved: false,
+          is_active: false
+        })
+        .eq('id', businessId);
+
+      if (error) throw error;
+      
+      // Reload pending businesses
+      loadPendingBusinesses();
+    } catch (error) {
+      console.error('Error rejecting business:', error);
     }
   };
 
@@ -150,53 +222,77 @@ const SimpleAdminDashboard = () => {
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Admin Panel</h3>
             <nav className="space-y-2">
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => setActiveTab('overview')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === 'overview' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 <BarChart3 className="w-5 h-5" />
-                <span>Dashboard</span>
+                <span>Overview</span>
               </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => setActiveTab('businesses')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === 'businesses' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Building className="w-5 h-5" />
+                <span>Business Approval</span>
+                {pendingBusinesses.length > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {pendingBusinesses.length}
+                  </span>
+                )}
+              </button>
+              <button 
+                onClick={() => setActiveTab('users')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === 'users' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 <Users className="w-5 h-5" />
                 <span>Users</span>
               </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                <Building className="w-5 h-5" />
-                <span>Businesses</span>
-              </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => setActiveTab('bookings')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === 'bookings' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 <Calendar className="w-5 h-5" />
                 <span>Bookings</span>
               </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                <DollarSign className="w-5 h-5" />
-                <span>Revenue</span>
-              </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                <AlertTriangle className="w-5 h-5" />
-                <span>Alerts</span>
-              </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => setActiveTab('categories')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === 'categories' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 <Settings className="w-5 h-5" />
-                <span>Settings</span>
+                <span>Categories</span>
               </button>
             </nav>
           </div>
         </div>
 
         <div className="flex-1 max-w-7xl mx-auto px-6 py-12">
-        {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Welcome, Admin!
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            You have successfully logged in as an administrator. This is your dedicated admin panel.
-          </p>
-        </motion.div>
+          {activeTab === 'overview' && (
+            <>
+              {/* Welcome Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-center mb-12"
+              >
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                  Welcome, Admin!
+                </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  You have successfully logged in as an administrator. This is your dedicated admin panel.
+                </p>
+              </motion.div>
 
         {/* Stats Cards */}
         <motion.div
@@ -382,37 +478,169 @@ const SimpleAdminDashboard = () => {
               </div>
             </motion.div>
 
-        {/* Success Message */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="glass-card p-8 rounded-xl text-center"
-        >
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Admin Access Confirmed!</h2>
-          <p className="text-gray-600 mb-6">
-            You have successfully logged in as an admin. The admin dashboard is working perfectly.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/')}
-              className="btn-primary"
+            {/* Success Message */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="glass-card p-8 rounded-xl text-center"
             >
-              View Public Site
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-secondary"
-            >
-              Refresh Dashboard
-            </button>
-          </div>
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Admin Access Confirmed!</h2>
+              <p className="text-gray-600 mb-6">
+                You have successfully logged in as an admin. The admin dashboard is working perfectly.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => navigate('/')}
+                  className="btn-primary"
+                >
+                  View Public Site
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="btn-secondary"
+                >
+                  Refresh Dashboard
+                </button>
+              </div>
             </motion.div>
-          </div>
+            </>
+          )}
+
+          {activeTab === 'businesses' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
+            >
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Business Approval</h2>
+                <p className="text-lg text-gray-600">
+                  Review and approve business applications
+                </p>
+              </div>
+
+              {pendingBusinesses.length === 0 ? (
+                <div className="glass-card p-8 rounded-xl text-center">
+                  <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Pending Applications</h3>
+                  <p className="text-gray-600">All business applications have been reviewed.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {pendingBusinesses.map((business) => (
+                    <div key={business.id} className="glass-card p-6 rounded-xl">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">{business.business_name}</h3>
+                          <p className="text-gray-600 mb-2">{business.business_type}</p>
+                          <p className="text-sm text-gray-500 mb-4">{business.description}</p>
+                          
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Location:</span>
+                              <p className="text-gray-600">{business.location}</p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Email:</span>
+                              <p className="text-gray-600">{business.email}</p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Phone:</span>
+                              <p className="text-gray-600">{business.phone || 'Not provided'}</p>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Website:</span>
+                              <p className="text-gray-600">{business.website || 'Not provided'}</p>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <span className="text-sm font-medium text-gray-700">Service Categories:</span>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {business.business_service_categories?.map((category, index) => (
+                                <span
+                                  key={index}
+                                  className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+                                >
+                                  {category.service_categories?.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="text-sm text-gray-500">
+                            Applied: {new Date(business.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex space-x-4">
+                        <button
+                          onClick={() => handleApproveBusiness(business.id)}
+                          className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Approve</span>
+                        </button>
+                        <button
+                          onClick={() => handleRejectBusiness(business.id)}
+                          className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          <span>Reject</span>
+                        </button>
+                        <button className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                          <Eye className="w-4 h-4" />
+                          <span>View Details</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {activeTab === 'users' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">User Management</h2>
+              <p className="text-lg text-gray-600">User management features coming soon...</p>
+            </motion.div>
+          )}
+
+          {activeTab === 'bookings' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Booking Management</h2>
+              <p className="text-lg text-gray-600">Booking management features coming soon...</p>
+            </motion.div>
+          )}
+
+          {activeTab === 'categories' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <AdminCategoryManager />
+            </motion.div>
+          )}
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default SimpleAdminDashboard;
+export default SimpleAdminDashboard;

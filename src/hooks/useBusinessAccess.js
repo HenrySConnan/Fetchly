@@ -3,41 +3,54 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
 export const useBusinessAccess = () => {
-  const [isBusinessAccount, setIsBusinessAccount] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isBusiness, setIsBusiness] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [businessProfile, setBusinessProfile] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
+    const checkBusinessAccess = async () => {
+      if (!user) {
+        setIsBusiness(false);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Check if user has an approved business profile
+        const { data, error: businessError } = await supabase
+          .from('business_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_approved', true)
+          .eq('is_active', true)
+          .single();
+
+        if (businessError && businessError.code !== 'PGRST116') {
+          console.error('Error checking business access:', businessError);
+          setError(businessError.message);
+          setIsBusiness(false);
+        } else if (data) {
+          setIsBusiness(true);
+          setBusinessProfile(data);
+        } else {
+          setIsBusiness(false);
+        }
+      } catch (err) {
+        console.error('Error checking business access:', err);
+        setError(err.message);
+        setIsBusiness(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     checkBusinessAccess();
   }, [user]);
 
-  const checkBusinessAccess = async () => {
-    if (!user) {
-      setIsBusinessAccount(false);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data: businessProfile, error } = await supabase
-        .from('business_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error checking business access:', error);
-        setIsBusinessAccount(false);
-      } else {
-        setIsBusinessAccount(!!businessProfile);
-      }
-    } catch (error) {
-      console.error('Error checking business access:', error);
-      setIsBusinessAccount(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { isBusinessAccount, loading };
+  return { isBusiness, isLoading, error, businessProfile };
 };

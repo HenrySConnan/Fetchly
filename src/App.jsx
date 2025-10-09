@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext';
+import { useUserType } from './hooks/useUserType';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Auth from './components/Auth';
@@ -25,7 +26,18 @@ const Shop = () => (
 
 function AppContent() {
   const location = useLocation();
+  const { userType, isLoading } = useUserType();
   const isAdminPage = location.pathname === '/admin';
+  const isBusinessPage = location.pathname === '/business';
+
+  // Show loading while determining user type
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -43,10 +55,21 @@ function AppContent() {
           <Route path="/packages" element={<ServicePackages />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/business" element={<BusinessDashboard />} />
+          <Route path="/dashboard" element={
+            userType === 'admin' ? <Navigate to="/admin" replace /> :
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <Dashboard />
+          } />
+          <Route path="/business" element={
+            userType === 'admin' ? <Navigate to="/admin" replace /> :
+            userType === 'business' ? <BusinessDashboard /> :
+            <Navigate to="/business-upgrade" replace />
+          } />
           <Route path="/business-upgrade" element={<BusinessUpgrade />} />
-          <Route path="/admin" element={<SimpleAdminDashboard />} />
+          <Route path="/admin" element={
+            userType === 'admin' ? <SimpleAdminDashboard /> :
+            <Navigate to="/" replace />
+          } />
           <Route path="/auth" element={<Auth />} />
         </Routes>
       </motion.main>
