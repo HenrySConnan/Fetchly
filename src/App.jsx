@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
@@ -11,7 +11,7 @@ import ServicePackages from './pages/ServicePackages';
 import Dashboard from './pages/Dashboard';
 import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessUpgrade from './pages/BusinessUpgrade';
-import AdminDashboard from './pages/AdminDashboard';
+import SimpleAdminDashboard from './pages/SimpleAdminDashboard';
 import Waitlist from './pages/Waitlist';
 
 const Shop = () => (
@@ -23,34 +23,43 @@ const Shop = () => (
   </div>
 );
 
+function AppContent() {
+  const location = useLocation();
+  const isAdminPage = location.pathname === '/admin';
+
+  return (
+    <div className="min-h-screen">
+      {!isAdminPage && <Navbar />}
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className={!isAdminPage ? "pb-20 md:pb-0" : ""}
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/deals" element={<Deals />} />
+          <Route path="/packages" element={<ServicePackages />} />
+          <Route path="/waitlist" element={<Waitlist />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/business" element={<BusinessDashboard />} />
+          <Route path="/business-upgrade" element={<BusinessUpgrade />} />
+          <Route path="/admin" element={<SimpleAdminDashboard />} />
+          <Route path="/auth" element={<Auth />} />
+        </Routes>
+      </motion.main>
+      {!isAdminPage && <Footer />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen">
-          <Navbar />
-          <motion.main
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="pb-20 md:pb-0"
-          >
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route path="/deals" element={<Deals />} />
-                  <Route path="/packages" element={<ServicePackages />} />
-                  <Route path="/waitlist" element={<Waitlist />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/business" element={<BusinessDashboard />} />
-                  <Route path="/business-upgrade" element={<BusinessUpgrade />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/auth" element={<Auth />} />
-                </Routes>
-          </motion.main>
-          <Footer />
-        </div>
+        <AppContent />
       </Router>
     </AuthProvider>
   );

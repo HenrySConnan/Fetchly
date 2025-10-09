@@ -12,7 +12,7 @@ const Navbar = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { isBusinessAccount } = useBusinessAccess();
-  const { isAdmin } = useAdminAccess();
+  const { isAdmin, isLoading: adminLoading } = useAdminAccess();
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Heart },
@@ -110,14 +110,16 @@ const Navbar = () => {
                         <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200">
                           {user.email}
                         </div>
-                        <Link
-                          to="/dashboard"
-                          onClick={() => setShowUserMenu(false)}
-                          className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
-                        >
-                          <User className="w-4 h-4" />
-                          <span>Dashboard</span>
-                        </Link>
+                        {!adminLoading && !isAdmin && (
+                          <Link
+                            to="/dashboard"
+                            onClick={() => setShowUserMenu(false)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                          >
+                            <User className="w-4 h-4" />
+                            <span>Dashboard</span>
+                          </Link>
+                        )}
                         {isBusinessAccount && (
                           <Link
                             to="/business"
@@ -128,7 +130,7 @@ const Navbar = () => {
                             <span>Business</span>
                           </Link>
                         )}
-                        {isAdmin && (
+                        {!adminLoading && isAdmin && (
                           <Link
                             to="/admin"
                             onClick={() => setShowUserMenu(false)}
@@ -238,14 +240,16 @@ const Navbar = () => {
                     </div>
                   </div>
                   
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="block px-4 py-3 text-sm text-gray-700 hover:text-primary-600 hover:bg-gray-50 flex items-center space-x-2"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>Dashboard</span>
-                  </Link>
+                  {!adminLoading && !isAdmin && (
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-700 hover:text-primary-600 hover:bg-gray-50 flex items-center space-x-2"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  )}
                   
                   {isBusinessAccount && (
                     <Link
@@ -257,7 +261,7 @@ const Navbar = () => {
                       <span>Business</span>
                     </Link>
                   )}
-                  {isAdmin && (
+                  {!adminLoading && isAdmin && (
                     <Link
                       to="/admin"
                       onClick={() => setIsOpen(false)}

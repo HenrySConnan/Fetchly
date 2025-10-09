@@ -35,8 +35,12 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useAdminAccess } from '../hooks/useAdminAccess';
 
 const BusinessDashboard = () => {
+  const { user } = useAuth();
+  const { isAdmin, isLoading: adminLoading } = useAdminAccess();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [services, setServices] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -45,8 +49,13 @@ const BusinessDashboard = () => {
   const [editingService, setEditingService] = useState(null);
   const [isBusinessAccount, setIsBusinessAccount] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
-  const { user } = useAuth();
-  const navigate = useNavigate();
+
+  // Redirect admin users to admin dashboard
+  useEffect(() => {
+    if (!adminLoading && isAdmin) {
+      navigate('/admin');
+    }
+  }, [isAdmin, adminLoading, navigate]);
 
   // Mock data for demonstration
   const mockServices = [

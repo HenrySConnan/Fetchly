@@ -30,9 +30,14 @@ const Auth = () => {
           setMessage(error.message)
         } else {
           setMessage('Successfully signed in!')
-          // Redirect to home page after successful login
+          // Check if user is admin and redirect accordingly
           setTimeout(() => {
-            navigate('/')
+            // Check if the email is the admin email
+            if (formData.email === 'henry@donco.co.za') {
+              navigate('/admin')
+            } else {
+              navigate('/')
+            }
           }, 1000)
         }
       } else {

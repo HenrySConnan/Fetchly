@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, 
   Calendar, 
@@ -21,11 +22,21 @@ import {
   X
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useAdminAccess } from '../hooks/useAdminAccess';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { isAdmin, isLoading: adminLoading } = useAdminAccess();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  // Redirect admin users to admin dashboard
+  useEffect(() => {
+    if (!adminLoading && isAdmin) {
+      navigate('/admin');
+    }
+  }, [isAdmin, adminLoading, navigate]);
   const [isAddingPet, setIsAddingPet] = useState(false);
   const [profileData, setProfileData] = useState({
     firstName: 'John',
