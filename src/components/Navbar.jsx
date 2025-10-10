@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart, User, LogOut, Calendar, ShoppingBag, Percent, Package, Clock, Building, Shield } from 'lucide-react';
+import { Menu, X, Heart, User, LogOut, Calendar, ShoppingBag, Percent, Package, Clock, Building, Shield, BarChart3, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useBusinessAccess } from '../hooks/useBusinessAccess';
@@ -12,11 +12,12 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { isBusinessAccount } = useBusinessAccess();
+  const { isBusiness: isBusinessAccount } = useBusinessAccess();
   const { isAdmin, isLoading: adminLoading } = useAdminAccess();
   const { userType } = useUserType();
 
-  const navLinks = [
+  // Regular user navigation
+  const userNavLinks = [
     { name: 'Home', path: '/', icon: Heart },
     { name: 'Services', path: '/services', icon: Calendar },
     { name: 'Deals', path: '/deals', icon: Percent },
@@ -25,13 +26,54 @@ const Navbar = () => {
     { name: 'Shop', path: '/shop', icon: ShoppingBag },
   ];
 
-  // Mobile bottom nav items (most important)
-  const mobileNavItems = [
-    { name: 'Home', path: '/', icon: Heart },
-    { name: 'Services', path: '/services', icon: Calendar },
-    { name: 'Deals', path: '/deals', icon: Percent },
-    { name: 'Profile', path: user ? '/dashboard' : '/auth', icon: User },
+  // Business navigation - only business management features
+  const businessNavLinks = [
+    { name: 'Overview', path: '/business', icon: Building },
+    { name: 'Services', path: '/business', icon: Calendar },
+    { name: 'Bookings', path: '/business', icon: Clock },
+    { name: 'Deals', path: '/business', icon: Percent },
+    { name: 'Promotions', path: '/business', icon: Package },
+    { name: 'Analytics', path: '/business', icon: BarChart3 },
+    { name: 'Settings', path: '/business', icon: Settings },
   ];
+
+  // Admin navigation
+  const adminNavLinks = [
+    { name: 'Admin Dashboard', path: '/admin', icon: Shield },
+  ];
+
+  // Get appropriate navigation based on user type
+  const getNavLinks = () => {
+    if (isAdmin) return adminNavLinks;
+    if (isBusinessAccount) return businessNavLinks;
+    return userNavLinks;
+  };
+
+  // Get mobile navigation based on user type
+  const getMobileNavItems = () => {
+    if (isAdmin) {
+      return [
+        { name: 'Admin', path: '/admin', icon: Shield },
+      ];
+    }
+    if (isBusinessAccount) {
+      return [
+        { name: 'Overview', path: '/business', icon: Building },
+        { name: 'Services', path: '/business', icon: Calendar },
+        { name: 'Bookings', path: '/business', icon: Clock },
+        { name: 'Deals', path: '/business', icon: Percent },
+        { name: 'Promotions', path: '/business', icon: Package },
+        { name: 'Analytics', path: '/business', icon: BarChart3 },
+        { name: 'Settings', path: '/business', icon: Settings },
+      ];
+    }
+    return [
+      { name: 'Home', path: '/', icon: Heart },
+      { name: 'Services', path: '/services', icon: Calendar },
+      { name: 'Deals', path: '/deals', icon: Percent },
+      { name: 'Profile', path: user ? '/dashboard' : '/auth', icon: User },
+    ];
+  };
 
   return (
     <>
@@ -49,7 +91,7 @@ const Navbar = () => {
 
             {/* Desktop Navigation Links */}
             <div className="flex items-center space-x-8">
-              {navLinks.map((link) => (
+              {getNavLinks().map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
@@ -70,21 +112,14 @@ const Navbar = () => {
               {user ? (
                 <div className="flex items-center space-x-4">
                   <Link
-                    to="/dashboard"
+                    to={isAdmin ? "/admin" : isBusinessAccount ? "/business" : "/dashboard"}
                     className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors px-3 py-2 rounded-lg hover:bg-primary-50"
                   >
                     <User className="w-4 h-4" />
-                    <span className="text-sm font-medium">Dashboard</span>
+                    <span className="text-sm font-medium">
+                      {isAdmin ? "Admin" : isBusinessAccount ? "Business" : "Dashboard"}
+                    </span>
                   </Link>
-                  {isBusinessAccount && (
-                    <Link
-                      to="/business"
-                      className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition-colors px-3 py-2 rounded-lg hover:bg-primary-50"
-                    >
-                      <Building className="w-4 h-4" />
-                      <span className="text-sm font-medium">Business</span>
-                    </Link>
-                  )}
                   {isAdmin && (
                     <Link
                       to="/admin"
@@ -198,34 +233,19 @@ const Navbar = () => {
             className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-xl"
           >
             <div className="py-4 space-y-2">
-              {/* Additional Pages */}
-              <Link
-                to="/packages"
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-3 font-medium transition-colors ${
-                  location.pathname === '/packages' ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
-                }`}
-              >
-                Service Packages
-              </Link>
-              <Link
-                to="/waitlist"
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-3 font-medium transition-colors ${
-                  location.pathname === '/waitlist' ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
-                }`}
-              >
-                Waitlist
-              </Link>
-              <Link
-                to="/shop"
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-3 font-medium transition-colors ${
-                  location.pathname === '/shop' ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
-                }`}
-              >
-                Shop
-              </Link>
+              {/* Dynamic Navigation based on user type */}
+              {getNavLinks().map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-4 py-3 font-medium transition-colors ${
+                    location.pathname === link.path ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
               
               {/* User Section */}
               {user ? (
@@ -304,7 +324,7 @@ const Navbar = () => {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-lg">
         <div className="flex items-center justify-around py-2">
-          {mobileNavItems.map((item) => (
+          {getMobileNavItems().map((item) => (
             <Link
               key={item.name}
               to={item.path}

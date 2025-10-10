@@ -50,11 +50,26 @@ function AppContent() {
       >
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/deals" element={<Deals />} />
-          <Route path="/packages" element={<ServicePackages />} />
-          <Route path="/waitlist" element={<Waitlist />} />
-          <Route path="/shop" element={<Shop />} />
+          <Route path="/services" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <Services />
+          } />
+          <Route path="/deals" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <Deals />
+          } />
+          <Route path="/packages" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <ServicePackages />
+          } />
+          <Route path="/waitlist" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <Waitlist />
+          } />
+          <Route path="/shop" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <Shop />
+          } />
           <Route path="/dashboard" element={
             userType === 'admin' ? <Navigate to="/admin" replace /> :
             userType === 'business' ? <Navigate to="/business" replace /> :

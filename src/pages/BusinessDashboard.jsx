@@ -18,22 +18,16 @@ import { useBusinessAccess } from '../hooks/useBusinessAccess';
 import { useAuth } from '../contexts/AuthContext';
 
 const BusinessDashboard = () => {
-  const { isBusinessOwner, isBusinessApproved, businessProfile, isLoading } = useBusinessAccess();
+  const { isBusiness, businessProfile, isLoading } = useBusinessAccess();
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    if (!isLoading && !isBusinessOwner) {
+    if (!isLoading && !isBusiness) {
       navigate('/');
     }
-  }, [isBusinessOwner, isLoading, navigate]);
-
-  useEffect(() => {
-    if (!isLoading && isBusinessOwner && !isBusinessApproved) {
-      navigate('/business-upgrade');
-    }
-  }, [isBusinessOwner, isBusinessApproved, isLoading, navigate]);
+  }, [isBusiness, isLoading, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -48,28 +42,8 @@ const BusinessDashboard = () => {
     );
   }
 
-  if (!isBusinessOwner) {
+  if (!isBusiness) {
     return null;
-  }
-
-  if (!isBusinessApproved) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="glass-card p-8 rounded-2xl text-center max-w-md">
-          <Building className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Business Application Pending</h2>
-          <p className="text-gray-600 mb-6">
-            Your business application is currently under review. You'll receive an email notification once it's approved.
-          </p>
-          <button
-            onClick={() => navigate('/')}
-            className="btn-primary"
-          >
-            Return to Home
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (

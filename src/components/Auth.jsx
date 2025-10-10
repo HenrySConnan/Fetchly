@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useBusinessAccess } from '../hooks/useBusinessAccess'
 import { useAdminAccess } from '../hooks/useAdminAccess'
+import { supabase } from '../lib/supabase'
 import { Mail, Lock, User, Eye, EyeOff, Building } from 'lucide-react'
 import BusinessSignupModal from './BusinessSignupModal'
 
@@ -20,7 +21,7 @@ const Auth = () => {
   const [message, setMessage] = useState('')
 
   const { signIn, signUp, signOut, user } = useAuth()
-  const { isBusinessOwner, isBusinessApproved } = useBusinessAccess()
+  const { isBusiness, businessProfile } = useBusinessAccess()
   const { isAdmin } = useAdminAccess()
   const navigate = useNavigate()
 
@@ -40,11 +41,21 @@ const Auth = () => {
           }
         } else {
           // Check if user is a business owner but not approved
-          if (isBusinessOwner && !isBusinessApproved) {
-            setMessage('Your business application is still pending admin approval. You will be able to sign in once approved.')
-            // Sign out the user since they're not approved yet
-            await signOut()
-            return
+          // Only check this for non-admin users
+          if (!isAdmin && !isBusiness) {
+            // Check if this user has a business profile but isn't approved
+            const { data: businessProfile } = await supabase
+              .from('business_profiles')
+              .select('*')
+              .eq('user_id', user.id)
+              .single();
+            
+            if (businessProfile && !businessProfile.is_approved) {
+              setMessage('Your business application is still pending admin approval. You will be able to sign in once approved.')
+              // Sign out the user since they're not approved yet
+              await signOut()
+              return
+            }
           }
           
           setMessage('Successfully signed in!')
@@ -52,7 +63,7 @@ const Auth = () => {
           setTimeout(() => {
             if (isAdmin) {
               navigate('/admin')
-            } else if (isBusinessOwner && isBusinessApproved) {
+            } else if (isBusiness) {
               navigate('/business')
             } else {
               navigate('/')
