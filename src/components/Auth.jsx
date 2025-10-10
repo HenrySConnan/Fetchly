@@ -19,7 +19,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  const { signIn, signUp, user } = useAuth()
+  const { signIn, signUp, signOut, user } = useAuth()
   const { isBusinessOwner, isBusinessApproved } = useBusinessAccess()
   const { isAdmin } = useAdminAccess()
   const navigate = useNavigate()
@@ -33,8 +33,20 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password)
         if (error) {
-          setMessage(error.message)
+          if (error.message.includes('Email not confirmed')) {
+            setMessage('Please check your email and click the confirmation link before signing in.')
+          } else {
+            setMessage(error.message)
+          }
         } else {
+          // Check if user is a business owner but not approved
+          if (isBusinessOwner && !isBusinessApproved) {
+            setMessage('Your business application is still pending admin approval. You will be able to sign in once approved.')
+            // Sign out the user since they're not approved yet
+            await signOut()
+            return
+          }
+          
           setMessage('Successfully signed in!')
           // Redirect based on user type
           setTimeout(() => {

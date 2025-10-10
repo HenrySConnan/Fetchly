@@ -21,8 +21,7 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
     email: '',
     password: '',
     website: '',
-    licenseNumber: '',
-    serviceCategories: []
+    licenseNumber: ''
   });
 
   const [businessCategories, setBusinessCategories] = useState([]);
@@ -36,9 +35,9 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
 
   const fetchBusinessCategories = async () => {
     try {
-      console.log('Fetching business categories...');
+      console.log('Fetching service categories...');
       const { data, error } = await supabase
-        .from('business_categories')
+        .from('service_categories')
         .select('*')
         .order('name');
 
@@ -52,7 +51,7 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
       console.log('Number of categories:', data?.length || 0);
       setBusinessCategories(data || []);
     } catch (error) {
-      console.error('Error fetching business categories:', error);
+      console.error('Error fetching service categories:', error);
       // Set fallback categories if the query fails
       const fallbackCategories = [
         { id: 1, name: 'Veterinary Services' },
@@ -80,14 +79,6 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
     }));
   };
 
-  const handleCategoryToggle = (categoryId) => {
-    setFormData(prev => ({
-      ...prev,
-      serviceCategories: prev.serviceCategories.includes(categoryId)
-        ? prev.serviceCategories.filter(id => id !== categoryId)
-        : [...prev.serviceCategories, categoryId]
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,16 +107,6 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
       // Wait a moment for the user to be fully created
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Sign in the user to ensure they have proper permissions
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
-      });
-
-      if (signInError) {
-        console.warn('Sign in failed, but continuing with profile creation:', signInError);
-      }
-
       // Then create business profile
       const { data: businessProfile, error: businessError } = await supabase
         .from('business_profiles')
@@ -147,8 +128,12 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
 
       if (businessError) throw businessError;
 
+      // IMPORTANT: Sign out the user immediately after account creation
+      // This ensures they remain signed out until admin approval
+      await supabase.auth.signOut();
+
       // Business profile created successfully
-      setSuccess('Business account created successfully! Your application is pending admin approval. Please check your email to verify your account.');
+      setSuccess('Business account created successfully! Your application is now pending admin approval. You will be able to sign in once an admin approves your business.');
       setStep(3);
       
       if (onSuccess) {
@@ -174,8 +159,7 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
       email: '',
       password: '',
       website: '',
-      licenseNumber: '',
-      serviceCategories: []
+      licenseNumber: ''
     });
     setError('');
     setSuccess('');
@@ -380,6 +364,7 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
             placeholder="Business license number (optional)"
           />
         </div>
+
       </div>
 
       <div className="flex justify-between">
@@ -418,9 +403,14 @@ const BusinessSignupModal = ({ isOpen, onClose, onSuccess }) => {
         <p className="text-gray-600 mb-4">
           Your business application has been submitted for review. You'll receive an email notification once it's approved.
         </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
-            <strong>Next Steps:</strong> Our admin team will review your application and approve it within 24-48 hours. You'll be able to access your business dashboard once approved.
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <p className="text-sm text-yellow-800">
+            <strong>Important:</strong> You are currently signed out. You will NOT be able to sign in until an admin approves your business application.
+          </p>
+        </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-sm text-green-800">
+            <strong>Next Steps:</strong> Our admin team will review your application and approve it within 24-48 hours. Once approved, you'll be able to sign in and access your business dashboard.
           </p>
         </div>
       </div>

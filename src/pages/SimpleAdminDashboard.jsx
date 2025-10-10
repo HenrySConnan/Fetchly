@@ -67,12 +67,7 @@ const SimpleAdminDashboard = () => {
     try {
       const { data, error } = await supabase
         .from('business_profiles')
-        .select(`
-          *,
-          business_service_categories(
-            service_categories(name)
-          )
-        `)
+        .select('*')
         .eq('is_approved', false)
         .order('created_at', { ascending: false });
 
@@ -558,16 +553,11 @@ const SimpleAdminDashboard = () => {
                           </div>
 
                           <div className="mb-4">
-                            <span className="text-sm font-medium text-gray-700">Service Categories:</span>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {business.business_service_categories?.map((category, index) => (
-                                <span
-                                  key={index}
-                                  className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
-                                >
-                                  {category.service_categories?.name}
-                                </span>
-                              ))}
+                            <span className="text-sm font-medium text-gray-700">Business Category:</span>
+                            <div className="mt-2">
+                              <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                                {business.business_type}
+                              </span>
                             </div>
                           </div>
 
