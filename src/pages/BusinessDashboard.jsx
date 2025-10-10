@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Building,
   Calendar,
@@ -16,11 +16,13 @@ import {
 } from 'lucide-react';
 import { useBusinessAccess } from '../hooks/useBusinessAccess';
 import { useAuth } from '../contexts/AuthContext';
+import BusinessServices from './BusinessServices';
 
 const BusinessDashboard = () => {
   const { isBusiness, businessProfile, isLoading } = useBusinessAccess();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -29,9 +31,22 @@ const BusinessDashboard = () => {
     }
   }, [isBusiness, isLoading, navigate]);
 
+  // Handle URL parameters for tab navigation
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['overview', 'services', 'bookings', 'deals', 'promotions', 'analytics', 'settings'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    navigate(`/business?tab=${tab}`, { replace: true });
   };
 
   if (isLoading) {
@@ -81,62 +96,8 @@ const BusinessDashboard = () => {
         </div>
       </div>
 
-      {/* Business Navigation Sidebar */}
-      <div className="flex">
-        <div className="w-64 bg-white shadow-sm border-r min-h-screen">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Business Panel</h3>
-            <nav className="space-y-2">
-              <button 
-                onClick={() => setActiveTab('overview')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === 'overview' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <BarChart3 className="w-5 h-5" />
-                <span>Overview</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('services')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === 'services' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Package className="w-5 h-5" />
-                <span>Services</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('bookings')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === 'bookings' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Calendar className="w-5 h-5" />
-                <span>Bookings</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('deals')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === 'deals' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Star className="w-5 h-5" />
-                <span>Deals & Promotions</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('settings')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === 'settings' ? 'bg-primary-100 text-primary-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Settings className="w-5 h-5" />
-                <span>Settings</span>
-              </button>
-            </nav>
-          </div>
-        </div>
-
-        <div className="flex-1 max-w-7xl mx-auto px-6 py-12">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
           {activeTab === 'overview' && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -245,7 +206,7 @@ const BusinessDashboard = () => {
                     Manage your upcoming appointments and bookings.
                   </p>
                   <button 
-                    onClick={() => setActiveTab('bookings')}
+                    onClick={() => handleTabChange('bookings')}
                     className="w-full btn-primary text-sm"
                   >
                     View Bookings
@@ -256,15 +217,7 @@ const BusinessDashboard = () => {
           )}
 
           {activeTab === 'services' && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center"
-            >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Service Management</h2>
-              <p className="text-lg text-gray-600">Service management features coming soon...</p>
-            </motion.div>
+            <BusinessServices />
           )}
 
           {activeTab === 'bookings' && (
@@ -291,6 +244,30 @@ const BusinessDashboard = () => {
             </motion.div>
           )}
 
+          {activeTab === 'analytics' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Business Analytics</h2>
+              <p className="text-lg text-gray-600">Analytics and reporting features coming soon...</p>
+            </motion.div>
+          )}
+
+          {activeTab === 'promotions' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
+            >
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Promotions Management</h2>
+              <p className="text-lg text-gray-600">Promotional campaigns management coming soon...</p>
+            </motion.div>
+          )}
+
           {activeTab === 'settings' && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -302,7 +279,6 @@ const BusinessDashboard = () => {
               <p className="text-lg text-gray-600">Settings features coming soon...</p>
             </motion.div>
           )}
-        </div>
       </div>
     </div>
   );

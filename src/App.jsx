@@ -6,7 +6,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Auth from './components/Auth';
 import Home from './pages/Home';
-import Services from './pages/Services';
+import ServicesNew from './pages/ServicesNew';
+import BusinessServicesPage from './pages/BusinessServicesPage';
 import Deals from './pages/Deals';
 import ServicePackages from './pages/ServicePackages';
 import Dashboard from './pages/Dashboard';
@@ -52,7 +53,11 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/services" element={
             userType === 'business' ? <Navigate to="/business" replace /> :
-            <Services />
+            <ServicesNew />
+          } />
+          <Route path="/business/:businessId" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <BusinessServicesPage />
           } />
           <Route path="/deals" element={
             userType === 'business' ? <Navigate to="/business" replace /> :

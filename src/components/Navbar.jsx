@@ -28,13 +28,13 @@ const Navbar = () => {
 
   // Business navigation - only business management features
   const businessNavLinks = [
-    { name: 'Overview', path: '/business', icon: Building },
-    { name: 'Services', path: '/business', icon: Calendar },
-    { name: 'Bookings', path: '/business', icon: Clock },
-    { name: 'Deals', path: '/business', icon: Percent },
-    { name: 'Promotions', path: '/business', icon: Package },
-    { name: 'Analytics', path: '/business', icon: BarChart3 },
-    { name: 'Settings', path: '/business', icon: Settings },
+    { name: 'Overview', path: '/business?tab=overview', icon: Building },
+    { name: 'Services', path: '/business?tab=services', icon: Calendar },
+    { name: 'Bookings', path: '/business?tab=bookings', icon: Clock },
+    { name: 'Deals', path: '/business?tab=deals', icon: Percent },
+    { name: 'Promotions', path: '/business?tab=promotions', icon: Package },
+    { name: 'Analytics', path: '/business?tab=analytics', icon: BarChart3 },
+    { name: 'Settings', path: '/business?tab=settings', icon: Settings },
   ];
 
   // Admin navigation
@@ -58,13 +58,13 @@ const Navbar = () => {
     }
     if (isBusinessAccount) {
       return [
-        { name: 'Overview', path: '/business', icon: Building },
-        { name: 'Services', path: '/business', icon: Calendar },
-        { name: 'Bookings', path: '/business', icon: Clock },
-        { name: 'Deals', path: '/business', icon: Percent },
-        { name: 'Promotions', path: '/business', icon: Package },
-        { name: 'Analytics', path: '/business', icon: BarChart3 },
-        { name: 'Settings', path: '/business', icon: Settings },
+        { name: 'Overview', path: '/business?tab=overview', icon: Building },
+        { name: 'Services', path: '/business?tab=services', icon: Calendar },
+        { name: 'Bookings', path: '/business?tab=bookings', icon: Clock },
+        { name: 'Deals', path: '/business?tab=deals', icon: Percent },
+        { name: 'Promotions', path: '/business?tab=promotions', icon: Package },
+        { name: 'Analytics', path: '/business?tab=analytics', icon: BarChart3 },
+        { name: 'Settings', path: '/business?tab=settings', icon: Settings },
       ];
     }
     return [
