@@ -17,6 +17,7 @@ import {
 import { useBusinessAccess } from '../hooks/useBusinessAccess';
 import { useAuth } from '../contexts/AuthContext';
 import BusinessServices from './BusinessServices';
+import BusinessBookings from './BusinessBookings';
 
 const BusinessDashboard = () => {
   const { isBusiness, businessProfile, isLoading } = useBusinessAccess();
@@ -221,15 +222,7 @@ const BusinessDashboard = () => {
           )}
 
           {activeTab === 'bookings' && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center"
-            >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Booking Management</h2>
-              <p className="text-lg text-gray-600">Booking management features coming soon...</p>
-            </motion.div>
+            <BusinessBookings />
           )}
 
           {activeTab === 'deals' && (

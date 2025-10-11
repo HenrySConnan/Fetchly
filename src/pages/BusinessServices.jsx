@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Tag, Clock, DollarSign, MapPin, Star, Phone, Mail, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Edit, Trash2, Tag, Clock, DollarSign, MapPin, Star, Phone, Mail, X, ChevronDown, ChevronUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { useBusinessAccess } from '../hooks/useBusinessAccess';
 import { supabase } from '../lib/supabase';
 
@@ -107,10 +107,25 @@ const ServiceManagementCard = ({ service, onEdit, onDelete }) => {
           </div>
         </div>
         
-        {/* Category */}
-        <div className="flex items-center space-x-2 mb-3">
-          <Tag className="w-4 h-4 text-purple-600" />
-          <span className="text-sm text-gray-600">{service.category}</span>
+        {/* Category and Approval Status */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
+            <Tag className="w-4 h-4 text-purple-600" />
+            <span className="text-sm text-gray-600">{service.category}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            {service.requires_approval ? (
+              <>
+                <AlertCircle className="w-3 h-3 text-yellow-500" />
+                <span className="text-xs text-yellow-600 font-medium">Manual Approval</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-3 h-3 text-green-500" />
+                <span className="text-xs text-green-600 font-medium">Auto-approve</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -129,7 +144,8 @@ const BusinessServices = () => {
     price: '',
     duration: '',
     category: '',
-    tags: []
+    tags: [],
+    requires_approval: false
   });
 
   // Service categories
@@ -182,6 +198,7 @@ const BusinessServices = () => {
         duration: parseInt(formData.duration),
         category: formData.category,
         tags: formData.tags,
+        requires_approval: formData.requires_approval,
         is_active: true
       };
 
@@ -209,7 +226,8 @@ const BusinessServices = () => {
         price: '',
         duration: '',
         category: '',
-        tags: []
+        tags: [],
+        requires_approval: false
       });
       setShowAddModal(false);
       setEditingService(null);
@@ -227,7 +245,8 @@ const BusinessServices = () => {
       price: service.price.toString(),
       duration: service.duration.toString(),
       category: service.category,
-      tags: service.tags || []
+      tags: service.tags || [],
+      requires_approval: service.requires_approval || false
     });
     setShowAddModal(true);
   };
@@ -430,6 +449,43 @@ const BusinessServices = () => {
                       <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Booking Approval
+                  </label>
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="radio"
+                        name="approval"
+                        value="auto"
+                        checked={!formData.requires_approval}
+                        onChange={() => setFormData(prev => ({ ...prev, requires_approval: false }))}
+                        className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-900">Auto-approve bookings</span>
+                        <p className="text-xs text-gray-500">Bookings are automatically confirmed</p>
+                      </div>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="radio"
+                        name="approval"
+                        value="manual"
+                        checked={formData.requires_approval}
+                        onChange={() => setFormData(prev => ({ ...prev, requires_approval: true }))}
+                        className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-900">Require manual approval</span>
+                        <p className="text-xs text-gray-500">You must approve each booking manually</p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
                 <div>
