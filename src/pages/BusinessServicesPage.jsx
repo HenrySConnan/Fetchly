@@ -1,9 +1,113 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Phone, Mail, Clock, DollarSign, Tag, Building, Calendar } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Phone, Mail, Clock, DollarSign, Tag, Building, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import EnhancedBookingModal from '../components/EnhancedBookingModal';
+
+// Service Card Component
+const ServiceCard = ({ service, onBook }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
+  
+  // Check if description is long enough to need truncation
+  const shouldTruncate = service.description && service.description.length > 100;
+  const truncatedDescription = shouldTruncate && !isExpanded 
+    ? service.description.substring(0, 100) + '...' 
+    : service.description;
+
+  useEffect(() => {
+    if (service.description && service.description.length > 100) {
+      setShowReadMore(true);
+    }
+  }, [service.description]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="bg-white/70 backdrop-blur-xl rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
+    >
+      {/* Service Header */}
+      <div className="p-6 pb-4">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-lg font-semibold text-gray-900 leading-tight">{service.name}</h3>
+          {/* Service Category */}
+          {service.service_categories && (
+            <span className="inline-block px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full font-medium ml-2 flex-shrink-0">
+              {service.service_categories.name}
+            </span>
+          )}
+        </div>
+        
+        {/* Service Description */}
+        <p className="text-gray-600 text-sm leading-relaxed mb-3">
+          {truncatedDescription}
+        </p>
+        
+        {/* Read More/Less Button */}
+        {showReadMore && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-primary-600 text-xs font-medium hover:text-primary-700 flex items-center space-x-1 mb-3"
+          >
+            <span>{isExpanded ? 'Show Less' : 'Read More'}</span>
+            {isExpanded ? (
+              <ChevronUp className="w-3 h-3" />
+            ) : (
+              <ChevronDown className="w-3 h-3" />
+            )}
+          </button>
+        )}
+      </div>
+
+      {/* Service Tags */}
+      {service.tags && service.tags.length > 0 && (
+        <div className="px-6 pb-4">
+          <div className="flex flex-wrap gap-1">
+            {service.tags.slice(0, 3).map((tag, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+            {service.tags.length > 3 && (
+              <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                +{service.tags.length - 3}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Service Details & Actions */}
+      <div className="px-6 pb-6">
+        {/* Price and Duration */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-1 text-green-600">
+            <DollarSign className="w-4 h-4" />
+            <span className="text-lg font-bold">${service.price}</span>
+          </div>
+          <div className="flex items-center space-x-1 text-blue-600 text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{service.duration || service.duration_minutes} min</span>
+          </div>
+        </div>
+
+        {/* Book Button */}
+        <button
+          onClick={onBook}
+          className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium py-3 px-4 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          Book This Service
+        </button>
+      </div>
+    </motion.div>
+  );
+};
 
 const BusinessServicesPage = () => {
   const { businessId } = useParams();
@@ -252,66 +356,11 @@ const BusinessServicesPage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((service) => (
-                <motion.div
-                  key={service.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="bg-white/70 backdrop-blur-xl rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{service.name}</h3>
-                    <p className="text-gray-600 text-sm mb-3">{service.description}</p>
-                    
-                    {/* Service Category */}
-                    {service.service_categories && (
-                      <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-xs rounded-full font-medium mb-3">
-                        {service.service_categories.name}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Service Tags */}
-                  {service.tags && service.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {service.tags.slice(0, 3).map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                      {service.tags.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                          +{service.tags.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Service Details */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4 text-sm text-gray-700">
-                      <div className="flex items-center space-x-1">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                        <span className="font-semibold">${service.price}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <span>{service.duration_minutes} min</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Book Button */}
-                  <button
-                    onClick={() => handleBookService(service)}
-                    className="w-full btn-primary text-sm"
-                  >
-                    Book This Service
-                  </button>
-                </motion.div>
+                <ServiceCard 
+                  key={service.id} 
+                  service={service} 
+                  onBook={() => handleBookService(service)} 
+                />
               ))}
             </div>
           )}
