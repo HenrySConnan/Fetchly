@@ -51,22 +51,34 @@ const ServicesNew = () => {
     try {
       setLoading(true);
       
-      // Fetch approved businesses with their services
+      // Fetch approved businesses first
       const { data: businessesData, error: businessesError } = await supabase
         .from('business_profiles')
-        .select(`
-          *,
-          business_services (*)
-        `)
+        .select('*')
         .eq('is_approved', true)
         .eq('is_active', true);
 
       if (businessesError) throw businessesError;
 
-      // Filter businesses that have active services and add default categories
-      const businessesWithServices = businessesData.filter(business => 
-        business.business_services && business.business_services.length > 0
-      ).map(business => ({
+      // Then fetch services for each business
+      const businessesWithServices = [];
+      for (const business of businessesData) {
+        const { data: servicesData, error: servicesError } = await supabase
+          .from('business_services')
+          .select('*')
+          .eq('business_id', business.id)
+          .eq('is_active', true);
+
+        if (!servicesError && servicesData && servicesData.length > 0) {
+          businessesWithServices.push({
+            ...business,
+            business_services: servicesData
+          });
+        }
+      }
+
+      // Add default categories to services
+      const formattedBusinesses = businessesWithServices.map(business => ({
         ...business,
         business_services: business.business_services.map(service => ({
           ...service,
@@ -78,7 +90,7 @@ const ServicesNew = () => {
       }));
 
       // If no businesses in database, show mock data for testing
-      if (businessesWithServices.length === 0) {
+      if (formattedBusinesses.length === 0) {
         const mockBusinesses = [
           {
             id: 'mock-1',
@@ -139,7 +151,7 @@ const ServicesNew = () => {
         ];
         setBusinesses(mockBusinesses);
       } else {
-        setBusinesses(businessesWithServices);
+        setBusinesses(formattedBusinesses);
       }
     } catch (error) {
       console.error('Error fetching businesses:', error);

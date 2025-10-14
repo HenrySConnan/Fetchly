@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, User, MapPin, Phone, Star, DollarSign, RotateCcw, Package, Bell, Settings } from 'lucide-react';
+import TimeSlotGenerator from './TimeSlotGenerator';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import calendarService from '../services/calendarService';
@@ -406,21 +407,16 @@ const EnhancedBookingModal = ({ isOpen, onClose, service, providers = [] }) => {
                       className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Select Time
-                    </label>
-                    <select
-                      value={selectedTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                      <option value="">Choose time</option>
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>{time}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {selectedDate && (
+                    <div className="col-span-2">
+                      <TimeSlotGenerator
+                        businessId={service.business_id}
+                        selectedDate={selectedDate}
+                        onSlotSelect={setSelectedTime}
+                        selectedSlot={selectedTime}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Service Packages */}

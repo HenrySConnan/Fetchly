@@ -18,6 +18,7 @@ import { useBusinessAccess } from '../hooks/useBusinessAccess';
 import { useAuth } from '../contexts/AuthContext';
 import BusinessServices from './BusinessServices';
 import BusinessBookings from './BusinessBookings';
+import BusinessSettings from './BusinessSettings';
 
 const BusinessDashboard = () => {
   const { isBusiness, businessProfile, isLoading } = useBusinessAccess();
@@ -221,9 +222,13 @@ const BusinessDashboard = () => {
             <BusinessServices />
           )}
 
-          {activeTab === 'bookings' && (
-            <BusinessBookings />
-          )}
+            {activeTab === 'bookings' && (
+              <BusinessBookings />
+            )}
+
+            {activeTab === 'settings' && (
+              <BusinessSettings />
+            )}
 
           {activeTab === 'deals' && (
             <motion.div
@@ -261,17 +266,6 @@ const BusinessDashboard = () => {
             </motion.div>
           )}
 
-          {activeTab === 'settings' && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center"
-            >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Business Settings</h2>
-              <p className="text-lg text-gray-600">Settings features coming soon...</p>
-            </motion.div>
-          )}
       </div>
     </div>
   );

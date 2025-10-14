@@ -40,24 +40,6 @@ const Auth = () => {
             setMessage(error.message)
           }
         } else {
-          // Check if user is a business owner but not approved
-          // Only check this for non-admin users
-          if (!isAdmin && !isBusiness) {
-            // Check if this user has a business profile but isn't approved
-            const { data: businessProfile } = await supabase
-              .from('business_profiles')
-              .select('*')
-              .eq('user_id', user.id)
-              .single();
-            
-            if (businessProfile && !businessProfile.is_approved) {
-              setMessage('Your business application is still pending admin approval. You will be able to sign in once approved.')
-              // Sign out the user since they're not approved yet
-              await signOut()
-              return
-            }
-          }
-          
           setMessage('Successfully signed in!')
           // Redirect based on user type
           setTimeout(() => {
