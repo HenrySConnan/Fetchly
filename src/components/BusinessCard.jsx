@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Star, MapPin, Phone, Mail, Clock, DollarSign, Tag, Heart, Building } from 'lucide-react';
-import BusinessHours from './BusinessHours';
 
 const BusinessCard = ({ business, services, onBookService }) => {
   const navigate = useNavigate();
@@ -64,10 +63,7 @@ const BusinessCard = ({ business, services, onBookService }) => {
               )}
             </div>
             
-            {/* Business Hours */}
-            <div className="mt-2">
-              <BusinessHours businessId={business.id} />
-            </div>
+            {/* Business Hours removed from card - only show in business info section */}
           </div>
           
           {/* Rating */}
