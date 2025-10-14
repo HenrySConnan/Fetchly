@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, MapPin, Phone, Mail, Clock, DollarSign, Tag, Building, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Phone, Mail, Clock, DollarSign, Tag, Building, Calendar, ChevronDown, ChevronUp, Globe, Award, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import EnhancedBookingModal from '../components/EnhancedBookingModal';
+import BusinessHours from '../components/BusinessHours';
 
 // Service Card Component
 const ServiceCard = ({ service, onBook }) => {
@@ -337,7 +338,7 @@ const BusinessServicesPage = () => {
           </div>
         </motion.div>
 
-        {/* Services Section */}
+        {/* Services Section - Moved up for better visibility */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -364,6 +365,101 @@ const BusinessServicesPage = () => {
               ))}
             </div>
           )}
+        </motion.div>
+
+        {/* Business Information Section - Moved after services */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-12"
+        >
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Business Information</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Business Hours */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <Clock className="w-5 h-5 text-primary-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Business Hours</h3>
+              </div>
+              <BusinessHours businessId={business.id} />
+            </div>
+
+            {/* Contact & Additional Info */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <Shield className="w-5 h-5 text-primary-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Contact & Information</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Location */}
+                <div className="flex items-start space-x-3">
+                  <MapPin className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-900">Location</p>
+                    <p className="text-gray-600">{business.location}</p>
+                  </div>
+                </div>
+
+                {/* Phone */}
+                {business.phone && (
+                  <div className="flex items-start space-x-3">
+                    <Phone className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-gray-900">Phone</p>
+                      <a href={`tel:${business.phone}`} className="text-primary-600 hover:text-primary-700">
+                        {business.phone}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Email */}
+                {business.email && (
+                  <div className="flex items-start space-x-3">
+                    <Mail className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-gray-900">Email</p>
+                      <a href={`mailto:${business.email}`} className="text-primary-600 hover:text-primary-700">
+                        {business.email}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Website */}
+                {business.website && (
+                  <div className="flex items-start space-x-3">
+                    <Globe className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-gray-900">Website</p>
+                      <a 
+                        href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary-600 hover:text-primary-700"
+                      >
+                        {business.website}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Business Type */}
+                {business.business_type && (
+                  <div className="flex items-start space-x-3">
+                    <Award className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-gray-900">Business Type</p>
+                      <p className="text-gray-600 capitalize">{business.business_type}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
 
