@@ -238,8 +238,12 @@ const BusinessServicesPage = () => {
   };
 
   const handleBookService = (service) => {
-    setSelectedService(service);
-    setShowBookingModal(true);
+    navigate(`/booking/${business.id}/${service.id}`, {
+      state: {
+        service,
+        business
+      }
+    });
   };
 
   if (loading) {

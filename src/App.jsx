@@ -8,6 +8,7 @@ import Auth from './components/Auth';
 import Home from './pages/Home';
 import ServicesNew from './pages/ServicesNew';
 import BusinessServicesPage from './pages/BusinessServicesPage';
+import BookingFlow from './pages/BookingFlow';
 import Deals from './pages/Deals';
 import ServicePackages from './pages/ServicePackages';
 import Dashboard from './pages/Dashboard';
@@ -58,6 +59,10 @@ function AppContent() {
           <Route path="/business/:businessId" element={
             userType === 'business' ? <Navigate to="/business" replace /> :
             <BusinessServicesPage />
+          } />
+          <Route path="/booking/:businessId/:serviceId" element={
+            userType === 'business' ? <Navigate to="/business" replace /> :
+            <BookingFlow />
           } />
           <Route path="/deals" element={
             userType === 'business' ? <Navigate to="/business" replace /> :

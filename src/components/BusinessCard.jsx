@@ -26,6 +26,16 @@ const BusinessCard = ({ business, services, onBookService }) => {
     navigate(`/business/${business.id}`);
   };
 
+  const handleBookService = (service, e) => {
+    e.stopPropagation(); // Prevent card click
+    navigate(`/booking/${business.id}/${service.id}`, {
+      state: {
+        service,
+        business
+      }
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
