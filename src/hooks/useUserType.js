@@ -36,5 +36,18 @@ export const useUserType = () => {
     determineUserType();
   }, [user, isAdmin, isBusiness, adminLoading, businessLoading]);
 
+  // Fallback timeout to prevent infinite loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        console.warn('User type determination timed out, defaulting to user');
+        setUserType('user');
+        setIsLoading(false);
+      }
+    }, 5000); // 5 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
   return { userType, isLoading };
 };

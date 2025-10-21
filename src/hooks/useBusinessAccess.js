@@ -21,14 +21,24 @@ export const useBusinessAccess = () => {
         setIsLoading(true);
         setError(null);
 
+        // Add timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Business access timeout')), 3000)
+        );
+
         // Check if user has an approved business profile
-        const { data, error: businessError } = await supabase
+        const businessPromise = supabase
           .from('business_profiles')
           .select('*')
           .eq('user_id', user.id)
           .eq('is_approved', true)
           .eq('is_active', true)
           .single();
+
+        const { data, error: businessError } = await Promise.race([
+          businessPromise,
+          timeoutPromise
+        ]);
 
         if (businessError && businessError.code !== 'PGRST116') {
           console.error('Error checking business access:', businessError);
@@ -41,7 +51,7 @@ export const useBusinessAccess = () => {
           setIsBusiness(false);
         }
       } catch (err) {
-        console.error('Error checking business access:', err);
+        console.warn('Business access check failed, defaulting to false:', err.message);
         setError(err.message);
         setIsBusiness(false);
       } finally {

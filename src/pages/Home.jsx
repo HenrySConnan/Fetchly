@@ -20,134 +20,141 @@ const Home = () => {
     },
     {
       icon: MapPin,
-      title: 'Track Bookings',
-      description: 'Monitor appointments and get real-time updates on services.',
+      title: 'Find Local Services',
+      description: 'Connect with nearby pet professionals in your area.',
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50'
     }
   ];
 
   const stats = [
-    { number: '10K+', label: 'Happy Pets', icon: Heart },
-    { number: '500+', label: 'Expert Vets', icon: Star },
-    { number: '50+', label: 'Cities', icon: MapPin },
-    { number: '4.9', label: 'Rating', icon: Star }
+    { number: '10,000+', label: 'Happy Pet Owners' },
+    { number: '500+', label: 'Trusted Professionals' },
+    { number: '50+', label: 'Cities Covered' },
+    { number: '99%', label: 'Satisfaction Rate' }
   ];
 
-  const featuredDeals = [
+  const testimonials = [
     {
-      id: 1,
-      title: 'New Pet Owner Package',
-      description: 'Complete care package for your new furry friend',
-      originalPrice: 299,
-      discountedPrice: 199,
-      discount: 33,
-      validUntil: '2024-02-15',
-      isLimited: true
+      name: 'Sarah Johnson',
+      role: 'Dog Owner',
+      content: 'Fetchly has made managing my dog\'s care so much easier. I can book grooming and vet appointments in seconds!',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
     },
     {
-      id: 2,
-      title: 'Monthly Grooming Subscription',
-      description: 'Professional grooming every month with premium care',
-      originalPrice: 120,
-      discountedPrice: 89,
-      discount: 26,
-      validUntil: '2024-03-01',
-      isLimited: false
+      name: 'Mike Chen',
+      role: 'Cat Owner',
+      content: 'The pet sitting services are amazing. My cat loves the sitter and I get peace of mind when traveling.',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
     },
     {
-      id: 3,
-      title: 'First-Time Customer Special',
-      description: 'Welcome to PetConnect! Get 30% off your first service',
-      originalPrice: 100,
-      discountedPrice: 70,
-      discount: 30,
-      validUntil: '2024-03-15',
-      isLimited: false
+      name: 'Emily Rodriguez',
+      role: 'Pet Parent',
+      content: 'Finding reliable pet services was always a challenge. Fetchly connects me with the best professionals in my area.',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
     }
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Hero Section */}
-      <section className="relative pt-24 pb-4 overflow-hidden">
+      <section className="relative pt-20 pb-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center max-w-4xl mx-auto"
+            className="text-center"
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center space-x-2 bg-primary-50 text-primary-600 px-4 py-2 rounded-full text-sm font-medium mb-8"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Trusted by 10,000+ pet owners</span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight"
-            >
-              Care for Your
-              <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent block">
-                Furry Friends
-              </span>
-            </motion.h1>
+            <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-xl rounded-full px-4 py-2 mb-8 shadow-lg">
+              <Sparkles className="w-4 h-4 text-yellow-500" />
+              <span className="text-sm font-medium text-gray-700">New: AI-Powered Pet Care Recommendations</span>
+            </div>
             
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
-            >
-              Book professional pet services and shop premium products all in one place. 
-              Your pets deserve the best care.
-            </motion.p>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Your Pet's
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Perfect Match</span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Connect with trusted pet professionals, discover amazing products, and give your furry friends the care they deserve. All in one place.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/services"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
+              >
+                <span>Find Services</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              
+              <Link
+                to="/deals"
+                className="inline-flex items-center space-x-2 bg-white text-gray-900 px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 border border-gray-200"
+              >
+                <Percent className="w-5 h-5" />
+                <span>View Deals</span>
+              </Link>
+            </div>
           </motion.div>
         </div>
+      </section>
 
-        {/* Background Elements */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary-100 rounded-full blur-3xl opacity-60"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-100 rounded-full blur-3xl opacity-60"></div>
+      {/* Stats Section */}
+      <section className="py-16 bg-white/50 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+          >
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{stat.number}</div>
+                <div className="text-gray-600">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-4">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Everything Your Pet Needs</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              From professional services to premium products, we've got your pet covered.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="glass-card rounded-2xl p-8 group cursor-pointer"
+                className={`${feature.bgColor} rounded-2xl p-8 hover:shadow-lg transition-all duration-300`}
               >
-                <div className={`w-16 h-16 ${feature.bgColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className={`w-8 h-8 bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`} />
+                <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} text-white mb-6`}>
+                  <feature.icon className="w-6 h-6" />
                 </div>
-                
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  {feature.description}
-                </p>
-
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 mb-6">{feature.description}</p>
                 <Link
-                  to={feature.title === 'Book Services' ? '/services' : feature.title === 'Shop Products' ? '/shop' : '/bookings'}
-                  className="inline-flex items-center space-x-2 text-primary-600 font-medium hover:text-primary-700 transition-colors"
+                  to="/services"
+                  className="inline-flex items-center space-x-2 text-gray-900 font-medium hover:space-x-3 transition-all duration-300"
                 >
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4" />
@@ -155,171 +162,53 @@ const Home = () => {
               </motion.div>
             ))}
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Everything Your Pet Needs
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From professional services to premium products, we've got your pet covered.
-            </p>
-          </motion.div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-white/50 backdrop-blur-sm">
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <stat.icon className="w-6 h-6 text-primary-600" />
-                  <span className="text-4xl font-bold text-gray-900">{stat.number}</span>
-                </div>
-                <p className="text-gray-600 font-medium">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Featured Deals Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mr-4">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-                Exclusive
-                <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent block">
-                  Pet Deals
-                </span>
-              </h2>
-            </div>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Save big on premium pet care services. Limited-time offers you won't want to miss!
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
-          >
-            {featuredDeals.map((deal, index) => (
-              <motion.div
-                key={deal.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="glass-card rounded-2xl overflow-hidden group cursor-pointer relative"
-              >
-                {/* Deal Badge */}
-                <div className="absolute top-4 right-4 z-10">
-                  <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
-                    <Percent className="w-3 h-3" />
-                    <span>{deal.discount}% OFF</span>
-                  </div>
-                </div>
-
-                {/* Limited Badge */}
-                {deal.isLimited && (
-                  <div className="absolute top-4 left-4 z-10">
-                    <div className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
-                      <Timer className="w-3 h-3" />
-                      <span>LIMITED</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Deal Content */}
-                <div className="p-6">
-                  <div className="h-32 bg-gradient-to-br from-primary-100 to-accent-100 flex items-center justify-center mb-6 rounded-xl">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
-                      <Tag className="w-8 h-8 text-white" />
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{deal.title}</h3>
-                  <p className="text-gray-600 mb-4 text-sm leading-relaxed">{deal.description}</p>
-
-                  {/* Pricing */}
-                  <div className="mb-6">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <span className="text-2xl font-bold text-primary-600">${deal.discountedPrice}</span>
-                      <span className="text-lg text-gray-400 line-through">${deal.originalPrice}</span>
-                    </div>
-                    <p className="text-sm text-gray-500">You save ${deal.originalPrice - deal.discountedPrice}</p>
-                  </div>
-
-                  {/* Expiry */}
-                  <div className="flex items-center space-x-2 text-red-600 mb-6">
-                    <Timer className="w-4 h-4" />
-                    <span className="text-sm font-medium">
-                      Expires {new Date(deal.validUntil).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
-
-                  {/* Claim Button */}
-                  <Link 
-                    to="/deals"
-                    className="w-full btn-primary group-hover:scale-105 transition-transform duration-300 flex items-center justify-center space-x-2"
-                  >
-                    <span>Claim Deal</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="text-center"
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            <Link 
-              to="/deals"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-600 to-accent-500 text-white px-8 py-4 rounded-xl font-semibold hover:scale-105 transition-all duration-300 hover:shadow-lg"
-            >
-              <span>View All Deals</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Pet Parents Say</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Join thousands of happy pet owners who trust Fetchly with their furry family members.
+            </p>
           </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="flex items-center mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
+                <div className="flex items-center">
+                  <img
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full mr-4 object-cover"
+                  />
+                  <div>
+                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                    <div className="text-gray-600 text-sm">{testimonial.role}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -327,30 +216,30 @@ const Home = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary-600 to-accent-500 rounded-3xl p-12 text-center text-white relative overflow-hidden"
+            transition={{ duration: 0.6 }}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center text-white"
           >
-            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-            <div className="relative z-10">
-              <h2 className="text-4xl font-bold mb-6">
-                Ready to Give Your Pet the Best?
-              </h2>
-              <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-                Join thousands of pet owners who trust us with their furry family members.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link to="/services" className="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 hover:scale-105 hover:shadow-lg inline-flex items-center space-x-2">
-                  <span>Browse Services</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link to="/shop" className="bg-white/20 backdrop-blur-xl text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 hover:scale-105 border border-white/30 inline-flex items-center space-x-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  <span>Shop Now</span>
-                </Link>
-              </div>
+            <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
+            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+              Join thousands of pet parents who trust Fetchly for their pet care needs.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/services"
+                className="inline-flex items-center space-x-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
+              >
+                <span>Browse Services</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                to="/waitlist"
+                className="inline-flex items-center space-x-2 border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-blue-600 transition-all duration-300"
+              >
+                <span>Join Waitlist</span>
+                <Heart className="w-5 h-5" />
+              </Link>
             </div>
           </motion.div>
         </div>

@@ -41,6 +41,7 @@ function AppContent() {
     );
   }
 
+
   return (
     <div className="min-h-screen">
       {!isAdminPage && <Navbar />}

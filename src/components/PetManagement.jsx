@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Pet, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Heart, Save, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -139,7 +139,7 @@ const PetManagement = ({ onPetSelect, selectedPetId }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Pet className="w-5 h-5 text-primary-600" />
+          <Heart className="w-5 h-5 text-primary-600" />
           <h3 className="text-lg font-semibold text-gray-900">My Pets</h3>
         </div>
         <button
@@ -289,7 +289,7 @@ const PetManagement = ({ onPetSelect, selectedPetId }) => {
       {/* Pets List */}
       {pets.length === 0 ? (
         <div className="text-center py-8">
-          <Pet className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <Heart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h4 className="text-lg font-medium text-gray-900 mb-2">No Pets Added</h4>
           <p className="text-gray-600 mb-4">Add your pets to make booking easier</p>
           <button
@@ -315,7 +315,7 @@ const PetManagement = ({ onPetSelect, selectedPetId }) => {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center space-x-2">
-                  <Pet className="w-5 h-5 text-primary-600" />
+                  <Heart className="w-5 h-5 text-primary-600" />
                   <h4 className="font-semibold text-gray-900">{pet.name}</h4>
                 </div>
                 <div className="flex space-x-1">

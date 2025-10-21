@@ -1,42 +1,25 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Search,
-  Filter,
-  MapPin,
-  Star,
-  Clock,
-  DollarSign,
-  Tag,
-  Building,
-  Phone,
-  Mail,
-  Heart,
-  ChevronDown
-} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Star, MapPin, Clock, DollarSign, Tag, Search, Filter } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import BusinessCard from '../components/BusinessCard';
-import EnhancedBookingModal from '../components/EnhancedBookingModal';
+
 
 const ServicesNew = () => {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedBusiness, setSelectedBusiness] = useState(null);
-  const [selectedServices, setSelectedServices] = useState([]);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const navigate = useNavigate();
 
-  // Service categories
-  const serviceCategories = [
-    'All',
+  // Mock categories for display if no services have categories
+  const mockCategories = [
     'Grooming',
     'Veterinary',
-    'Dental',
     'Training',
     'Boarding',
-    'Walking',
     'Pet Sitting',
     'Emergency Care',
     'Nutrition',
@@ -51,34 +34,58 @@ const ServicesNew = () => {
     try {
       setLoading(true);
       
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database timeout')), 5000)
+      );
+
       // Fetch approved businesses first
-      const { data: businessesData, error: businessesError } = await supabase
+      const businessesPromise = supabase
         .from('business_profiles')
         .select('*')
         .eq('is_approved', true)
         .eq('is_active', true);
 
+      const { data: businessesData, error: businessesError } = await Promise.race([
+        businessesPromise,
+        timeoutPromise
+      ]);
+
       if (businessesError) throw businessesError;
 
       // Then fetch services for each business
-      const businessesWithServices = [];
+      const businessesWithServicesData = [];
       for (const business of businessesData) {
-        const { data: servicesData, error: servicesError } = await supabase
-          .from('business_services')
-          .select('*')
-          .eq('business_id', business.id)
-          .eq('is_active', true);
+        try {
+          const servicesTimeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Services timeout')), 3000)
+          );
 
-        if (!servicesError && servicesData && servicesData.length > 0) {
-          businessesWithServices.push({
-            ...business,
-            business_services: servicesData
-          });
+          const servicesPromise = supabase
+            .from('business_services')
+            .select('*')
+            .eq('business_id', business.id)
+            .eq('is_active', true);
+
+          const { data: servicesData, error: servicesError } = await Promise.race([
+            servicesPromise,
+            servicesTimeoutPromise
+          ]);
+
+          if (!servicesError && servicesData && servicesData.length > 0) {
+            businessesWithServicesData.push({
+              ...business,
+              business_services: servicesData
+            });
+          }
+        } catch (error) {
+          console.warn(`Failed to fetch services for business ${business.id}:`, error.message);
+          // Continue with other businesses even if one fails
         }
       }
 
       // Add default categories to services
-      const formattedBusinesses = businessesWithServices.map(business => ({
+      const formattedBusinesses = businessesWithServicesData.map(business => ({
         ...business,
         business_services: business.business_services.map(service => ({
           ...service,
@@ -107,44 +114,44 @@ const ServicesNew = () => {
                 price: 350,
                 duration_minutes: 120,
                 tags: ['All Breeds', 'Professional'],
-                service_categories: { name: 'Grooming' }
+                category: 'Grooming'
               },
               {
                 id: 'service-2',
-                name: 'Nail Trimming',
-                description: 'Safe and gentle nail trimming for all pets',
-                price: 80,
+                name: 'Nail Trim & Ear Clean',
+                description: 'Quick nail trim and gentle ear cleaning',
+                price: 120,
                 duration_minutes: 30,
-                tags: ['Quick Service', 'All Pets'],
-                service_categories: { name: 'Grooming' }
+                tags: ['Quick', 'Hygiene'],
+                category: 'Grooming'
               }
             ]
           },
           {
             id: 'mock-2',
-            business_name: 'Stellenbosch Vet Clinic',
-            bio: 'Full-service veterinary care with emergency services available 24/7.',
-            location: 'Stellenbosch',
+            business_name: 'Happy Tails Vet Clinic',
+            bio: 'Compassionate veterinary care for your beloved pets. From routine check-ups to emergency services.',
+            location: 'Cape Town',
             phone: '+27 21 987 6543',
-            email: 'info@stellenboschvet.co.za',
+            email: 'contact@happytails.co.za',
             business_services: [
               {
                 id: 'service-3',
-                name: 'Health Checkup',
-                description: 'Comprehensive health examination and vaccination',
-                price: 450,
+                name: 'Annual Check-up',
+                description: 'Comprehensive health check and vaccination',
+                price: 600,
                 duration_minutes: 60,
-                tags: ['Vaccination', 'Health Check'],
-                service_categories: { name: 'Veterinary' }
+                tags: ['Preventative', 'Vaccination'],
+                category: 'Veterinary'
               },
               {
                 id: 'service-4',
-                name: 'Dental Cleaning',
-                description: 'Professional dental cleaning and oral health assessment',
+                name: 'Emergency Consultation',
+                description: 'Urgent care for unexpected pet health issues',
                 price: 800,
                 duration_minutes: 90,
-                tags: ['Dental Care', 'Anesthesia'],
-                service_categories: { name: 'Dental' }
+                tags: ['Urgent', 'Critical Care'],
+                category: 'Veterinary'
               }
             ]
           }
@@ -160,153 +167,197 @@ const ServicesNew = () => {
     }
   };
 
-  const handleBookService = (business, services) => {
-    setSelectedBusiness(business);
-    setSelectedServices(services);
-    setShowBookingModal(true);
+  const handleBookService = (business) => {
+    navigate(`/business/${business.id}`);
   };
 
+  // Filter businesses based on search and category
   const filteredBusinesses = businesses.filter(business => {
-    const matchesSearch = business.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         business.bio.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         business.business_services.some(service => 
-                           service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           service.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-                         );
+    const matchesSearch = searchTerm === '' || 
+      business.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business.bio.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (business.business_services && business.business_services.some(service => 
+        service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        service.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
 
     const matchesCategory = selectedCategory === 'all' || 
-                           business.business_services.some(service => 
-                             service.category === selectedCategory
-                           );
+      (business.business_services && business.business_services.some(service => 
+        service.category === selectedCategory
+      ));
 
-    return matchesSearch && matchesCategory;
+    const matchesPrice = business.business_services && business.business_services.some(service => 
+      service.price >= priceRange[0] && service.price <= priceRange[1]
+    );
+
+    return matchesSearch && matchesCategory && (priceRange[0] === 0 && priceRange[1] === 1000 ? true : matchesPrice);
   });
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
-      <section className="pt-20 pb-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Find the Perfect <span className="text-primary-600">Pet Service</span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover trusted local businesses offering professional pet care services in your area.
-            </p>
-          </motion.div>
+    <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            Professional
+            <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent block">
+              Pet Services
+            </span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Discover trusted pet professionals in your area. Book services, read reviews, and give your pets the care they deserve.
+          </p>
+        </motion.div>
 
-          {/* Search and Filters */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg p-6 mb-8"
-          >
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Search Bar */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        {/* Search and Filter Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass-card rounded-2xl p-6 mb-8"
+        >
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Input */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Search for services, businesses, or tags..."
+                  placeholder="Search businesses, services, or locations..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
                 />
               </div>
+            </div>
 
-              {/* Category Filter */}
+            {/* Category Filter */}
+            <div className="lg:w-64">
               <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[200px]"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
                 >
-                  {serviceCategories.map((category) => (
-                    <option key={category} value={category === 'All' ? 'all' : category}>
+                  <option value="all">All Categories</option>
+                  {mockCategories.map((category) => (
+                    <option key={category} value={category}>
                       {category}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
+          </div>
 
-      {/* Businesses Grid */}
-      <section className="pb-20">
-        <div className="max-w-7xl mx-auto px-6">
-          {filteredBusinesses.length > 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8"
+          {/* Price Range Filter */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Price Range: R{priceRange[0]} - R{priceRange[1]}</label>
+            <div className="flex items-center space-x-4">
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                step="50"
+                value={priceRange[0]}
+                onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                className="flex-1"
+              />
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                step="50"
+                value={priceRange[1]}
+                onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {businesses.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Services Available</h3>
+            <p className="text-gray-600 mb-6">We're working on adding more pet service providers to your area.</p>
+            <button
+              onClick={() => navigate('/waitlist')}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {filteredBusinesses.map((business) => (
-                <BusinessCard
-                  key={business.id}
-                  business={business}
-                  services={business.business_services}
-                  onBookService={handleBookService}
-                />
-              ))}
-            </motion.div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Building className="w-12 h-12 text-gray-400" />
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">No businesses found</h3>
-              <p className="text-gray-600 mb-6">
-                {searchTerm || selectedCategory !== 'all' 
-                  ? 'Try adjusting your search or filter criteria.'
-                  : 'No businesses are currently available in your area.'
-                }
+              Join Waitlist
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Results Counter */}
+            <div className="mb-6">
+              <p className="text-gray-600">
+                {filteredBusinesses.length} business{filteredBusinesses.length !== 1 ? 'es' : ''} found
+                {searchTerm && ` for "${searchTerm}"`}
+                {selectedCategory !== 'all' && ` in ${selectedCategory}`}
               </p>
-              {(searchTerm || selectedCategory !== 'all') && (
+            </div>
+
+            {filteredBusinesses.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <Search className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No businesses found</h3>
+                <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters.</p>
                 <button
                   onClick={() => {
                     setSearchTerm('');
                     setSelectedCategory('all');
+                    setPriceRange([0, 1000]);
                   }}
-                  className="btn-primary"
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Clear Filters
                 </button>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Enhanced Booking Modal */}
-      <EnhancedBookingModal
-        isOpen={showBookingModal}
-        onClose={() => {
-          setShowBookingModal(false);
-          setSelectedBusiness(null);
-          setSelectedServices([]);
-        }}
-        business={selectedBusiness}
-        services={selectedServices}
-      />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredBusinesses.map((business) => (
+                  <BusinessCard
+                    key={business.id}
+                    business={business}
+                    services={business.business_services || []}
+                    onBookService={handleBookService}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
