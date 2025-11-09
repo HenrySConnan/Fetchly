@@ -197,9 +197,9 @@ const ServicesNew = () => {
   if (loading) {
     return (
       <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="flex items-center justify-center h-48 sm:h-64">
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary-600"></div>
           </div>
         </div>
       </div>
@@ -208,19 +208,19 @@ const ServicesNew = () => {
 
   return (
     <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-6 sm:mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-3 sm:mb-6">
             Professional
             <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent block">
               Pet Services
             </span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-2">
             Discover trusted pet professionals in your area. Book services, read reviews, and give your pets the care they deserve.
           </p>
         </motion.div>
@@ -230,31 +230,31 @@ const ServicesNew = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="glass-card rounded-2xl p-6 mb-8"
+          className="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-8"
         >
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
             {/* Search Input */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="text"
-                  placeholder="Search businesses, services, or locations..."
+                  placeholder="Search businesses..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
+                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
                 />
               </div>
             </div>
 
             {/* Category Filter */}
-            <div className="lg:w-64">
+            <div className="w-full lg:w-64">
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
+                  className="w-full pl-9 sm:pl-10 pr-8 sm:pr-10 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
                 >
                   <option value="all">All Categories</option>
                   {mockCategories.map((category) => (
@@ -264,7 +264,7 @@ const ServicesNew = () => {
                   ))}
                 </select>
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
@@ -272,44 +272,57 @@ const ServicesNew = () => {
             </div>
           </div>
 
-          {/* Price Range Filter */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Price Range: R{priceRange[0]} - R{priceRange[1]}</label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="range"
-                min="0"
-                max="1000"
-                step="50"
-                value={priceRange[0]}
-                onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
-                className="flex-1"
-              />
-              <input
-                type="range"
-                min="0"
-                max="1000"
-                step="50"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                className="flex-1"
-              />
+          {/* Price Range Filter - Collapsible on Mobile */}
+          <details className="mt-3 sm:mt-4">
+            <summary className="text-xs sm:text-sm font-medium text-gray-700 cursor-pointer list-none">
+              <div className="flex items-center justify-between">
+                <span>Price Range: R{priceRange[0]} - R{priceRange[1]}</span>
+                <svg className="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </summary>
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                <span>Min: R{priceRange[0]}</span>
+                <span>Max: R{priceRange[1]}</span>
+              </div>
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="1000"
+                  step="50"
+                  value={priceRange[0]}
+                  onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                  className="flex-1 h-2"
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="1000"
+                  step="50"
+                  value={priceRange[1]}
+                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                  className="flex-1 h-2"
+                />
+              </div>
             </div>
-          </div>
+          </details>
         </motion.div>
 
         {businesses.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-8 sm:py-12">
+            <div className="text-gray-400 mb-3 sm:mb-4">
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Services Available</h3>
-            <p className="text-gray-600 mb-6">We're working on adding more pet service providers to your area.</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Services Available</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4">We're working on adding more pet service providers to your area.</p>
             <button
               onClick={() => navigate('/waitlist')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base rounded-lg hover:bg-blue-700 transition-colors"
             >
               Join Waitlist
             </button>
@@ -317,34 +330,42 @@ const ServicesNew = () => {
         ) : (
           <>
             {/* Results Counter */}
-            <div className="mb-6">
-              <p className="text-gray-600">
+            <div className="mb-4 sm:mb-6">
+              <p className="text-sm sm:text-base text-gray-600">
                 {filteredBusinesses.length} business{filteredBusinesses.length !== 1 ? 'es' : ''} found
-                {searchTerm && ` for "${searchTerm}"`}
-                {selectedCategory !== 'all' && ` in ${selectedCategory}`}
+                {searchTerm && (
+                  <span className="block sm:inline">
+                    {searchTerm && ` for "${searchTerm}"`}
+                  </span>
+                )}
+                {selectedCategory !== 'all' && (
+                  <span className="block sm:inline sm:ml-1">
+                    {selectedCategory !== 'all' && ` in ${selectedCategory}`}
+                  </span>
+                )}
               </p>
             </div>
 
             {filteredBusinesses.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-gray-400 mb-4">
-                  <Search className="w-16 h-16 mx-auto" />
+              <div className="text-center py-8 sm:py-12">
+                <div className="text-gray-400 mb-3 sm:mb-4">
+                  <Search className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No businesses found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters.</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No businesses found</h3>
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4">Try adjusting your search criteria or filters.</p>
                 <button
                   onClick={() => {
                     setSearchTerm('');
                     setSelectedCategory('all');
                     setPriceRange([0, 1000]);
                   }}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-blue-600 text-white px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Clear Filters
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {filteredBusinesses.map((business) => (
                   <BusinessCard
                     key={business.id}
